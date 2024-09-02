@@ -24,3 +24,30 @@ The WikiMusic project is an invite-only community, with the goal of knowledge sh
 [[https://www.buymeacoffee.com/jjbigorra][Please donate by clicking here]]. This helps us keep the underlying cloud infrastructure and Joe's work hours going strong.
 
 In this Git repository you will find the source code behind WikiMusic's frontend.
+
+* Project management
+
+Find below a list ideas and work being done on this project by all our contributors.
+
+** Work in progress
+*** WIP Migration to GitHub
+
+
+** Project backlog
+*** TODO Automated Cabal Hackage release in CI and version bumps
+*** TODO Recently viewed functionality
+*** TODO Add optional lyrics for song textfield
+*** TODO Create and optimize custom Prelude, and clean all files imports
+*** TODO Improve reusability in ~fromString . T.unpack $ x~
+*** TODO  Extract language and DictTerm into its own package
+*** TODO Add better error handling and logging
+*** TODO Add back button in some pages, and redirect to logical places
+*** TODO Liked items list view (liked songs, liked genres)
+*** TODO Create "for profit" version (premium offline pre-rendered) of WikiMusic, as app, embedded SQLite
+*** TODO Use more non-empty types and sets if possible
+*** TODO Remove unused dependencies
+*** TODO Create black box tests for basic system functioning (with Mock REST API generated from the API Spec)
+*** TODO Genre <> Song <> Artist relation
+*** TODO Add forums 
+*** TODO Validate and limit size and type of files being uploaded
+**** TODO GP5 support (song file upload)
