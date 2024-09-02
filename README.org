@@ -55,8 +55,10 @@ Find below a list ideas and work being done on this project by all our contribut
 *** TODO Accessibility best practices
 *** TODO Validate and limit size and type of files being uploaded
 **** TODO GP5 support (song file upload)
+*** TODO Prometheus metrics and visualizations, use Grafana in Docker, also in production server
 
 ** Javascript
 *** TODO ASCII Tab editing and creating helpers
 *** TODO Chord highlighter and auto scroller as song view tools
 
+*** TODO Prometheus metrics and visualizations, use Grafana in Docker, also in production server
