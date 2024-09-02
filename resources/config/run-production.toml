@@ -1,0 +1,26 @@
+[servant]
+port = 6923
+host = "127.0.0.1"
+
+[cors]
+origins = [ "https://wikimusic.jointhefreeworld.org" ]
+methods = [ "OPTIONS", "HEAD", "POST", "GET" ]
+request-headers = [ "content-type", "access-control-allow-origin", "cookie" ]
+
+[web-frontend]
+base-url = "https://wikimusic.jointhefreeworld.org"
+
+[dev]
+reported-version = "prod"
+
+[cookie]
+same-site = "SameSiteStrict"
+secure = true
+max-age = 3110400000 # 100 years
+path = "/"
+domain = "wikimusic.jointhefreeworld.org"
+
+[api]
+host = "api.wikimusic.jointhefreeworld.org"
+port = 443
+protocol = "https"

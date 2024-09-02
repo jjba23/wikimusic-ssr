@@ -1,0 +1,26 @@
+#+title: WikiMusic  SSR
+#+options: toc:nil
+
+Server side rendered (SSR) frontend for WikiMusic
+
+/WikiMusic/
+
+#+begin_html
+<div>
+<img src="https://img.shields.io/badge/Haskell-5D4F85?logo=haskell&logoColor=fff&style=plastic" alt="Haskell"/>
+<img src="https://img.shields.io/badge/GNU%20Emacs-7F5AB6?logo=gnuemacs&logoColor=fff&style=plastic" alt="GNU Emacs"/>
+<img src="https://img.shields.io/badge/NixOS-5277C3?logo=nixos&logoColor=fff&style=plastic" alt="NixOS"/>
+</div>
+#+end_html
+
+
+WikiMusic as a software means an ingenious combination of a server-side-rendered frontend, a powerful backend REST API, a database, and a user-interface to create a Content Management System (CMS) and a Gallery for music of all kinds, with educational intents.
+
+This is 100% free software, licensed under the GNU General Public License v3 or later.
+[[https://www.gnu.org/licenses/gpl-3.0.en.html][Refer to the full license, on GNU's website]]
+
+The WikiMusic project is an invite-only community, with the goal of knowledge sharing, and not profit driven.
+
+[[https://www.buymeacoffee.com/jjbigorra][Please donate by clicking here]]. This helps us keep the underlying cloud infrastructure and Joe's work hours going strong.
+
+In this Git repository you will find the source code behind WikiMusic's frontend.

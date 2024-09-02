@@ -1,0 +1,10 @@
+.stack-work
+apollo-ssr.cabal
+stack.yaml.lock
+data/
+dist-newstyle/
+.HTF/
+result
+.direnv/
+resources/secrets
+node_modules/
