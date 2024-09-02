@@ -49,5 +49,14 @@ Find below a list ideas and work being done on this project by all our contribut
 *** TODO Create black box tests for basic system functioning (with Mock REST API generated from the API Spec)
 *** TODO Genre <> Song <> Artist relation
 *** TODO Add forums 
+*** TODO Invite users functionality
+*** TODO More reusable forms, with validations applied in Javascript
+*** TODO More separation of HTML components
+*** TODO Accessibility best practices
 *** TODO Validate and limit size and type of files being uploaded
 **** TODO GP5 support (song file upload)
+
+** Javascript
+*** TODO ASCII Tab editing and creating helpers
+*** TODO Chord highlighter and auto scroller as song view tools
+
