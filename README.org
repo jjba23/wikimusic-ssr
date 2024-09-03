@@ -56,6 +56,8 @@ Find below a list ideas and work being done on this project by all our contribut
 *** TODO Validate and limit size and type of files being uploaded
 **** TODO GP5 support (song file upload)
 *** TODO Prometheus metrics and visualizations, use Grafana in Docker, also in production server
+*** TODO Upon resetting password, reset to a page that explains you should have received an e-mail or add notification balloon
+*** TODO Notification system via ViewVars (vv) URL params, to show balloons with notifications like Done, Deleted, You Should have received email
 
 ** Javascript
 *** TODO ASCII Tab editing and creating helpers
