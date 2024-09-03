@@ -43,7 +43,8 @@ newClientEnv cfg = do
         { manager = manager,
           baseUrl = baseUrl',
           cookieJar = cookieJar,
-          makeClientRequest = defaultMakeClientRequest
+          makeClientRequest = defaultMakeClientRequest,
+          middleware = id
         }
 
 mkApp :: ApacheLogger -> AppConfig -> IO Application

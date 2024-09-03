@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
 name:           wikimusic-ssr
-version:        0.7.0.3
-description:    Please see the README at <https://gitlab.com/jjba-projects/wikimusic-ssr>
-homepage:       https://gitlab.com/jjba-projects/wikimusic-ssr
-bug-reports:    https://gitlab.com/jjba-projects/wikimusic-ssr/-/issues
+version:        0.7.0.5
+description:    Please see the README at <https://github.com/jjba23/wikimusic-ssr>
+homepage:       https://github.com/jjba23/wikimusic-ssr
+bug-reports:    https://github.com/jjba23/wikimusic-ssr/-/issues
 author:         Josep Bigorra
 maintainer:     Josep Bigorra <jjbigorra@gmail.com>
 copyright:      2023 Josep Bigorra
@@ -16,9 +16,10 @@ extra-source-files:
     README.org
     CHANGELOG.org
 
+    
 source-repository head
   type: git
-  location: https://gitlab.com/jjba-projects/wikimusic-ssr
+  location: https://github.com/jjba23/wikimusic-ssr
   subdir: wikimusic-ssr
 
 library

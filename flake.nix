@@ -25,7 +25,6 @@
               };
               shell.buildInputs = with pkgs; [
                 gnumake
-                simple-http-server
                 minify
                 haskell-language-server
                 watchexec
@@ -51,11 +50,4 @@
         legacyPackages = pkgs;
         packages.default = flake.packages."wikimusic-ssr:exe:wikimusic-ssr-exe";
       });
-
-  nixConfig = {
-    extra-substituters = [ "https://cache.iog.io" ];
-    extra-trusted-public-keys =
-      [ "hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=" ];
-    allow-import-from-derivation = "true";
-  };
 }

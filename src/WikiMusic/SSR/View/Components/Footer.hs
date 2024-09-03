@@ -20,7 +20,7 @@ simpleFooter vv = H.footer ! class_ "flex direction-column text-align-center gap
   small . text $ ((^. #more % #copyright0) |##| (vv ^. #language))
   a
     ! class_ "accent-color"
-    ! href "https://gitlab.com/jjba-projects/wikimusic-ssr"
+    ! href "https://github.com/jjba23/wikimusic-ssr"
     $ small
     . text
     $ ((^. #more % #copyright1) |##| (vv ^. #language))
