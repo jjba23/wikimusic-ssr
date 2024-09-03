@@ -25,7 +25,6 @@ errorPage' env vv _ maybeMessage = do
       ! class_ "font-size-small"
       $ text (maybe "Error ocurred!" (decodeUtf8 . B16.decodeLenient . fromString . T.unpack) maybeMessage)
   where
-    messageCauses :: Text
     messageCauses = T.intercalate " - " causeStrings
     causeStrings = catMaybes [Just "Error", if T.isInfixOf "504" (fromMaybe "Error ocurred!" maybeMessage) then Just "Gateway Timeout" else Nothing]
 
@@ -69,3 +68,5 @@ inviteUserPage' env vv = do
         option ! value "wm::superuser" $ "super user"
       optionalTextArea "description" "description"
       submitButton vv
+
+
