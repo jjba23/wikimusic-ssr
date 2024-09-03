@@ -1,7 +1,7 @@
 cabal-version: 1.12
 
 name:           wikimusic-ssr
-version:        0.7.0.2
+version:        0.7.0.3
 description:    Please see the README at <https://gitlab.com/jjba-projects/wikimusic-ssr>
 homepage:       https://gitlab.com/jjba-projects/wikimusic-ssr
 bug-reports:    https://gitlab.com/jjba-projects/wikimusic-ssr/-/issues
