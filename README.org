@@ -30,10 +30,11 @@ In this Git repository you will find the source code behind WikiMusic's frontend
 Find below a list ideas and work being done on this project by all our contributors.
 
 ** Work in progress
-*** WIP Migration to GitHub
+*** TODO Invite users functionality
 
 
 ** Project backlog
+
 *** TODO Automated Cabal Hackage release in CI and version bumps
 *** TODO Recently viewed functionality
 *** TODO Add optional lyrics for song textfield
@@ -45,11 +46,9 @@ Find below a list ideas and work being done on this project by all our contribut
 *** TODO Liked items list view (liked songs, liked genres)
 *** TODO Create "for profit" version (premium offline pre-rendered) of WikiMusic, as app, embedded SQLite
 *** TODO Use more non-empty types and sets if possible
-*** TODO Remove unused dependencies
 *** TODO Create black box tests for basic system functioning (with Mock REST API generated from the API Spec)
 *** TODO Genre <> Song <> Artist relation
 *** TODO Add forums 
-*** TODO Invite users functionality
 *** TODO More reusable forms, with validations applied in Javascript
 *** TODO More separation of HTML components
 *** TODO Accessibility best practices
@@ -64,3 +63,9 @@ Find below a list ideas and work being done on this project by all our contribut
 *** TODO Chord highlighter and auto scroller as song view tools
 
 *** TODO Prometheus metrics and visualizations, use Grafana in Docker, also in production server
+
+** Done
+*** DONE Migration to GitHub
+CLOSED: [2024-09-05 do 22:43]
+*** DONE Remove unused dependencies
+CLOSED: [2024-09-05 do 22:43]
