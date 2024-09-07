@@ -14,10 +14,13 @@ import Relude
 import WikiMusic.SSR.Config
 import WikiMusic.SSR.Model.Config
 import WikiMusic.SSR.Servant.ApiSetup
+import qualified Prometheus.Metric.GHC as P
+import qualified Prometheus as P
 
 boot :: (MonadIO m) => m ()
 boot = liftIO $ withStdoutLogger $ \logger' ->
   ( do
+      _ <- liftIO $ P.register P.ghcMetrics
       args <- liftIO getArgs
       maybeCfg <- readConfig (cfg args)
       liftIO $ either crashWithBadConfig (startWikiMusicSSR logger') maybeCfg

@@ -9,6 +9,9 @@ import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.Wai
 import Network.Wai.Logger (ApacheLogger)
 import Network.Wai.Middleware.Cors
+import qualified Prometheus.Metric.GHC as P
+import qualified Prometheus as P
+import qualified Network.Wai.Middleware.Prometheus as P
 import Network.Wai.Middleware.RequestLogger
 import Optics
 import Relude
@@ -76,6 +79,7 @@ mkApp logger' cfg = do
   pure
     . (if (cfg ^. #dev % #reportedVersion) == "dev" then logStdoutDev else logStdout)
     . myCors (cfg ^. #cors)
+    . P.prometheus P.def
     $ serveWithContext wikimusicSSRServant apiCfg (server env)
   where
     prepareCSS = T.filter (\x -> x /= '\n' && x /= '\t') . decodeUtf8

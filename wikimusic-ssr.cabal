@@ -1,7 +1,7 @@
 cabal-version: 1.12
 
 name:           wikimusic-ssr
-version:        0.7.0.5
+version:        1.0.0.0
 description:    Please see the README at <https://github.com/jjba23/wikimusic-ssr>
 homepage:       https://github.com/jjba23/wikimusic-ssr
 bug-reports:    https://github.com/jjba23/wikimusic-ssr/-/issues
@@ -107,6 +107,9 @@ library
     , servant-auth-server
     , servant-multipart
     , servant-client
+    , prometheus-client
+    , prometheus-metrics-ghc
+    , wai-middleware-prometheus
     , text
     , containers
     , filepath
@@ -136,7 +139,7 @@ executable wikimusic-ssr-exe
       Paths_wikimusic_ssr
   hs-source-dirs:
       app
-  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -rtsopts "-with-rtsopts=-T -N"
   default-extensions:
       DataKinds
       DefaultSignatures
