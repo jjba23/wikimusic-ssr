@@ -9,9 +9,8 @@
 module WikiMusic.SSR.View.HtmlUtil where
 
 import Principium
-import Text.Blaze.Html5 as H
+import Text.Blaze.Html5 as H hiding (div)
 import Text.Blaze.Html5.Attributes as A
-import WikiMusic.Model.Other
 import WikiMusic.SSR.View.Components.Footer
 import WikiMusic.SSR.View.Components.PageTop
 
@@ -54,19 +53,22 @@ maybeNextPaginationButton _ _ 0 = pure ()
 maybeNextPaginationButton (Limit 0) _ _ = pure ()
 maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
   when (itemSize == limit)
-    $ (H.button ! onclick (fromTextToAttributeValue func))
-    . H.small
-    $ "next >"
+    $ H.button
+    ! onclick (fromTextToAttributeValue func)
+    $ "("
+    <> pageNum
+    <> ") next page >"
   where
     offset' = show offset
     newOffset = show $ offset + limit
+    pageNum = show $ (offset `div` limit) + 1
     func =
       replaceText
         "\n"
         ""
         [trimming|(function(){
-                 if(/^offset$/.test(window.location)){
-                   window.location = window.location.replace("offset=$offset'", "offset=$newOffset");
+                 if(/offset/.test(window.location.toString())){
+                   window.location = window.location.toString().replace("offset=$offset'", "offset=$newOffset");
                    }else{
                    window.location = window.location + "?offset=$newOffset";
                    }
@@ -76,14 +78,17 @@ maybePrevPaginationButton :: Limit -> Offset -> Int -> Html
 maybePrevPaginationButton (Limit 0) _ _ = pure ()
 maybePrevPaginationButton (Limit limit) (Offset offset) _ =
   when (offset > 0)
-    $ (H.button ! onclick (fromTextToAttributeValue func))
-    . H.small
-    $ "< prev"
+    $ H.button
+    ! onclick (fromTextToAttributeValue func)
+    $ "< previous page ("
+    <> pageNum
+    <> ")"
   where
     offset' = show offset
     newOffset = show $ offset - limit
+    pageNum = show $ (offset `div` limit) - 1
     func =
       replaceText
         "\n"
         ""
-        [trimming|(function(){window.location = window.location.replace("offset=$offset'", "offset=$newOffset")})()|]
+        [trimming|(function(){window.location = window.location.toString().replace("offset=$offset'", "offset=$newOffset")})()|]
