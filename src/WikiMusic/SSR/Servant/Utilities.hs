@@ -5,23 +5,16 @@
 
 module WikiMusic.SSR.Servant.Utilities where
 
-import Control.Monad.Error.Class
 import Data.ByteString.Base16.Lazy qualified as B16
 import Data.Map qualified as Map
 import Data.Text qualified as T
-import Free.AlaCarte
 import NeatInterpolation
-import Optics
-import Relude
+import Principium
 import Servant
 import Servant.Multipart
-import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.Utf8
 import WikiMusic.SSR.Backend.Rest ()
 import WikiMusic.SSR.Free.View
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Config
-import WikiMusic.SSR.Model.Env
 import WikiMusic.SSR.View.Html ()
 
 fromForm :: MultipartData tag -> Text -> Text -> Text
@@ -94,23 +87,23 @@ vvFromCookies :: Maybe Text -> ViewVars
 vvFromCookies cookie = ViewVars {..}
   where
     cookieMap = mkCookieMap cookie
-    language = Language {value = fromMaybe "en" (cookieMap Map.!? localeCookieName)}
-    uiMode = UiMode {value = fromMaybe "light" (cookieMap Map.!? uiModeCookieName)}
-    authToken = AuthToken {value = decodeToken $ fromMaybe "" (cookieMap Map.!? authCookieName)}
-    songAsciiSize = SongAsciiSize {value = fromMaybe "medium" (cookieMap Map.!? songAsciiSizeCookieName)}
+    language = Language {value = fromMaybe "en" (cookieMap !? localeCookieName)}
+    uiMode = UiMode {value = fromMaybe "light" (cookieMap !? uiModeCookieName)}
+    authToken = AuthToken {value = decodeToken $ fromMaybe "" (cookieMap !? authCookieName)}
+    songAsciiSize = SongAsciiSize {value = fromMaybe "medium" (cookieMap !? songAsciiSizeCookieName)}
     artistSorting =
       SortOrder
-        { value = fromMaybe "created-at-desc" (cookieMap Map.!? artistSortingCookieName)
+        { value = fromMaybe "created-at-desc" (cookieMap !? artistSortingCookieName)
         }
     songSorting =
       SortOrder
-        { value = fromMaybe "created-at-desc" (cookieMap Map.!? songSortingCookieName)
+        { value = fromMaybe "created-at-desc" (cookieMap !? songSortingCookieName)
         }
     genreSorting =
       SortOrder
-        { value = fromMaybe "created-at-desc" (cookieMap Map.!? genreSortingCookieName)
+        { value = fromMaybe "created-at-desc" (cookieMap !? genreSortingCookieName)
         }
-    palette = Palette {value = fromMaybe "mauve" (cookieMap Map.!? paletteCookieName)}
+    palette = Palette {value = fromMaybe "mauve" (cookieMap !? paletteCookieName)}
 
 errorRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> Maybe Int -> Maybe Text -> m Html
 errorRoute env cookie _ maybeCode maybeMessage = do
@@ -152,13 +145,13 @@ respondWithHttp sr =
   throwError
     $ ServerError
       { errHTTPCode = sr ^. #code,
-        errReasonPhrase = fromString . T.unpack $ fromMaybe "" $ sr ^. #cause,
-        errBody = fromString . T.unpack $ fromMaybe "" $ sr ^. #body,
+        errReasonPhrase = T.unpack $ fromMaybe "" $ sr ^. #cause,
+        errBody = encodeUtf8 $ fromMaybe "" $ sr ^. #body,
         errHeaders =
           map
             ( bimap
-                (fromString . T.unpack)
-                (fromString . T.unpack)
+                (fromString . unpackText)
+                (fromString . unpackText)
             )
             (sr ^. #headers)
       }
@@ -187,3 +180,10 @@ respondWithViewOrErr :: (MonadIO m, MonadError ServerError m) => Either Text t -
 respondWithViewOrErr x eff = case x of
   Left e -> callErrorPage e
   Right r -> liftIO $ eff r
+
+respondWithViewOrErr' :: (MonadIO m, MonadError ServerError m) => Either Text (Maybe t) -> (t -> IO a) -> m a
+respondWithViewOrErr' x eff = case x of
+  Left e -> callErrorPage e
+  Right r -> case r of
+    Nothing -> callErrorPage "Error!"
+    Just item -> liftIO $ eff item

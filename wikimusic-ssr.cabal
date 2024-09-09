@@ -125,6 +125,7 @@ library
     , free-alacarte
     , tomland
     , blaze-html
+    , blaze-markup
     , wikimusic-model-hs
     , wikimusic-api-spec
     , http-client

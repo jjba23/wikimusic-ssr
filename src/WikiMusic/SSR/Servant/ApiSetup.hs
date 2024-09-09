@@ -2,8 +2,6 @@
 
 module WikiMusic.SSR.Servant.ApiSetup (mkApp) where
 
-import Data.Text qualified as T
-import Data.Time
 import Network.HTTP.Client (newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.Wai
@@ -11,15 +9,10 @@ import Network.Wai.Logger (ApacheLogger)
 import Network.Wai.Middleware.Cors
 import Network.Wai.Middleware.Prometheus qualified as P
 import Network.Wai.Middleware.RequestLogger
-import Optics
-import Prometheus qualified as P
-import Prometheus.Metric.GHC qualified as P
-import Relude
+import Principium
 import Servant
 import Servant.Client
 import WikiMusic.SSR.Backend.Rest ()
-import WikiMusic.SSR.Model.Config
-import WikiMusic.SSR.Model.Env
 import WikiMusic.SSR.Servant.ApiSpec
 import WikiMusic.SSR.Servant.ArtistRoutes
 import WikiMusic.SSR.Servant.GenreRoutes
@@ -37,7 +30,7 @@ newClientEnv cfg = do
     baseUrl' =
       BaseUrl
         { baseUrlScheme = if (cfg ^. #api % #protocol) == "https" then Https else Http,
-          baseUrlHost = T.unpack $ cfg ^. #api % #host,
+          baseUrlHost = unpackText $ cfg ^. #api % #host,
           baseUrlPort = cfg ^. #api % #port,
           baseUrlPath = ""
         }
@@ -82,7 +75,7 @@ mkApp logger' cfg = do
     . P.prometheus P.def
     $ serveWithContext wikimusicSSRServant apiCfg (server env)
   where
-    prepareCSS = T.filter (\x -> x /= '\n' && x /= '\t') . decodeUtf8
+    prepareCSS = filterText (\x -> x /= '\n' && x /= '\t') . decodeUtf8
 
 artistBaseEntityRoutes :: Env -> Server BaseEntityRoutes
 artistBaseEntityRoutes env =
@@ -191,9 +184,9 @@ myCors cfg = cors (const $ Just policy)
   where
     policy =
       CorsResourcePolicy
-        { corsOrigins = Just (map (fromString . T.unpack) (cfg ^. #origins), True),
-          corsMethods = map (fromString . T.unpack) (cfg ^. #methods),
-          corsRequestHeaders = map (fromString . T.unpack) (cfg ^. #requestHeaders),
+        { corsOrigins = Just (map encodeUtf8 (cfg ^. #origins), True),
+          corsMethods = map encodeUtf8 (cfg ^. #methods),
+          corsRequestHeaders = map (fromString . unpackText) (cfg ^. #requestHeaders),
           corsExposedHeaders =
             Just
               [ "content-type",

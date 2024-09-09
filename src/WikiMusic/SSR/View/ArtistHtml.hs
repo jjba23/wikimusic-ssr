@@ -36,7 +36,7 @@ artistListPage' env vv xs =
   where
     sortedXs =
       mapMaybe
-        (\identifier -> (xs ^. #artists) Map.!? identifier)
+        (\identifier -> (xs ^. #artists) Principium.!? identifier)
         (xs ^. #sortOrder)
 
 artistDetailPage' :: (MonadIO m) => Env -> ViewVars -> Artist -> m Html

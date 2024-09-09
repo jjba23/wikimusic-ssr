@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedLabels #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module WikiMusic.SSR.View.Components.Footer
   ( simpleFooter,
@@ -7,13 +6,9 @@ module WikiMusic.SSR.View.Components.Footer
   )
 where
 
-import Optics
-import Relude
-import Text.Blaze.Html
+import Principium
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
-import WikiMusic.SSR.Language
-import WikiMusic.SSR.Model.Api
 
 simpleFooter :: ViewVars -> Html
 simpleFooter vv = H.footer ! class_ "flex direction-column text-align-center gap-medium padding-large" $ do

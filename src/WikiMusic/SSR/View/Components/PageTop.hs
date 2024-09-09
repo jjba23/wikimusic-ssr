@@ -1,20 +1,10 @@
 {-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
-module WikiMusic.SSR.View.Components.PageTop
-  ( sharedPageTop,
-  )
-where
+module WikiMusic.SSR.View.Components.PageTop where
 
-import Data.Text qualified as T
-import Optics
-import Relude
-import Text.Blaze.Html
+import Principium
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
-import WikiMusic.SSR.Language
-import WikiMusic.SSR.Model.Api
 import WikiMusic.SSR.View.Components.Icons
 
 sharedPageTop :: Maybe Text -> ViewVars -> Html
@@ -27,7 +17,15 @@ sharedPageTop title' vv = do
     maybeTitle title'
 
 maybeTitle :: Maybe Text -> Html
-maybeTitle = mapM_ (\x -> H.div ! class_ "text-align-center" $ (h2 ! class_ "font-weight-300 font-size-xx-large") . fromString . T.unpack $ x)
+maybeTitle =
+  mapM_
+    ( \x ->
+        H.div
+          ! class_ "text-align-center"
+          $ (h2 ! class_ "font-weight-300 font-size-xx-large")
+          . text
+          $ x
+    )
 
 myNav :: ViewVars -> Html
 myNav vv = do
@@ -49,19 +47,19 @@ userPrefs vv = do
       ! enctype "multipart/form-data"
       $ do
         select ! onchange "this.form.submit()" ! name "locale" $ do
-          option !? ((vv ^. #language % #value) == "en", selected "true") ! value "en" $ "🇬🇧 English"
-          option !? ((vv ^. #language % #value) == "nl", selected "true") ! value "nl" $ "🇳🇱 Nederlands"
+          option H.!? ((vv ^. #language % #value) == "en", selected "true") ! value "en" $ "🇬🇧 English"
+          option H.!? ((vv ^. #language % #value) == "nl", selected "true") ! value "nl" $ "🇳🇱 Nederlands"
 
         noscript $ button ! type_ "submit" $ "submit"
     H.div $ H.form ! action "/user-preferences/dark-mode" ! method "POST" ! enctype "multipart/form-data" $ do
       select ! onchange "this.form.submit()" ! type_ "checkbox" ! name "dark-mode" ! A.id "dark-mode" $ do
-        option !? ((vv ^. #uiMode % #value) == "dark", selected "true") ! value "dark" $ simpleIcon "🌙" "dark mode"
-        option !? ((vv ^. #uiMode % #value) == "light", selected "true") ! value "light" $ simpleIcon "☀️" "light mode"
+        option H.!? ((vv ^. #uiMode % #value) == "dark", selected "true") ! value "dark" $ simpleIcon "🌙" "dark mode"
+        option H.!? ((vv ^. #uiMode % #value) == "light", selected "true") ! value "light" $ simpleIcon "☀️" "light mode"
       noscript $ button ! type_ "submit" $ "submit"
     H.div $ H.form ! action "/user-preferences/palette" ! method "POST" ! enctype "multipart/form-data" $ do
       select ! onchange "this.form.submit()" ! type_ "checkbox" ! name "palette" ! A.id "palette" $ do
-        option !? ((vv ^. #palette % #value) == "mauve", selected "true") ! value "mauve" $ "mauve"
-        option !? ((vv ^. #palette % #value) == "green", selected "true") ! value "green" $ "green"
+        option H.!? ((vv ^. #palette % #value) == "mauve", selected "true") ! value "mauve" $ "mauve"
+        option H.!? ((vv ^. #palette % #value) == "green", selected "true") ! value "green" $ "green"
       noscript $ button ! type_ "submit" $ "submit"
 
 topTitle :: ViewVars -> Html

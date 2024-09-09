@@ -1,14 +1,10 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
-
 module WikiMusic.SSR.View.Components.DetailList
   ( detailList,
     detailListEntry,
   )
 where
 
-import Relude
-import Text.Blaze.Html
+import Principium
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 

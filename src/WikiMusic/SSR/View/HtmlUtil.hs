@@ -7,7 +7,6 @@
 
 module WikiMusic.SSR.View.HtmlUtil where
 
-import Data.Text qualified as T
 import Principium
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
@@ -20,7 +19,7 @@ makeFieldLabelsNoPrefix ''SimplePageTitle
 
 mkSharedHead :: (MonadIO m) => Env -> ViewVars -> SimplePageTitle -> m Html
 mkSharedHead env vv pageTitle = do
-  let style' = fromString . T.unpack $ (env ^. #mainCss)
+  let style' = text (env ^. #mainCss)
   let modeStyle =
         if (vv ^. #uiMode % #value) == "dark"
           then env ^. #darkCss
@@ -32,10 +31,10 @@ mkSharedHead env vv pageTitle = do
   pure $ H.head $ do
     H.meta ! charset "utf-8"
     H.meta ! lang "en"
-    H.title . fromString . T.unpack $ (pageTitle ^. #value)
+    H.title . text $ (pageTitle ^. #value)
     meta ! name "viewport" ! content "width=device-width, initial-scale=1"
-    H.style $ fromString . T.unpack $ modeStyle
-    H.style $ fromString . T.unpack $ paletteStyle
+    H.style . text $ modeStyle
+    H.style . text $ paletteStyle
     H.style style'
 
 simplePage :: (MonadIO m) => Env -> ViewVars -> SimplePageTitle -> Html -> m Html

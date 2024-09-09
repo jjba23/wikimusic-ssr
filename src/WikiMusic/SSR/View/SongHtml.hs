@@ -10,19 +10,11 @@ module WikiMusic.SSR.View.SongHtml
   )
 where
 
-import Data.Map qualified as Map
-import Data.Text qualified as T
-import Data.UUID (UUID)
-import Optics
-import Relude
-import Text.Blaze.Html
-import Text.Blaze.Html5 as H
+import Principium
+import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import WikiMusic.Interaction.Model.Song
-import WikiMusic.Model.Song
-import WikiMusic.SSR.Language
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Env
+import WikiMusic.Model.Song hiding (show)
 import WikiMusic.SSR.View.Components.DetailList
 import WikiMusic.SSR.View.Components.Forms
 import WikiMusic.SSR.View.Components.Other
@@ -41,7 +33,7 @@ songListPage' env vv xs =
   where
     sortedXs =
       mapMaybe
-        (\identifier -> (xs ^. #songs) Map.!? identifier)
+        (\identifier -> (xs ^. #songs) Principium.!? identifier)
         (xs ^. #sortOrder)
 
 songDetailPage' :: (MonadIO m) => Env -> ViewVars -> Song -> m Html
@@ -53,7 +45,7 @@ songDetailPage' env vv x = do
       select ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
           ( \size' ->
-              let mkOption = option !? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (fromString . T.unpack $ size')
+              let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (fromTextToAttributeValue size')
                in mkOption . text $ size'
           )
           fontSizes
@@ -91,20 +83,20 @@ mkVersion vv v = H.article $ do
   detailList $ do
     mapM_
       (detailListEntry ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
-      (Relude.show <$> v ^. #lastEditedAt)
-    detailListEntry ((^. #more % #createdAt) |##| (vv ^. #language)) (Relude.show $ v ^. #createdAt)
-    detailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (Relude.show $ v ^. #createdBy)
+      (show <$> v ^. #lastEditedAt)
+    detailListEntry ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ v ^. #createdAt)
+    detailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
 
   mapM_
     ( \asciiLegend -> details ! open "" $ do
         H.summary "ASCII Legend"
-        (H.pre ! class_ (fromString . T.unpack $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
+        (H.pre ! class_ (fromTextToAttributeValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
     )
     (v ^. #asciiLegend)
   mapM_
     ( \asciiContents -> details ! open "" $ do
         H.summary "ASCII Content"
-        (H.pre ! class_ (fromString . T.unpack $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
+        (H.pre ! class_ (fromTextToAttributeValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
     )
     (v ^. #asciiContents)
   mapM_
@@ -116,7 +108,7 @@ mkVersion vv v = H.article $ do
             ! customAttribute "allowed" ""
             ! customAttribute "allowfullscreen" ""
             ! customAttribute "referrerpolicy" "noreferrer"
-            ! A.src (fromString . T.unpack $ pdfContents)
+            ! A.src (fromTextToAttributeValue pdfContents)
             $ ""
     )
     (v ^. #pdfContents)
@@ -141,7 +133,7 @@ songCreatePage' env vv = do
 songEditPage' :: (MonadIO m) => Env -> ViewVars -> Song -> m Html
 songEditPage' env vv song = do
   simplePage env vv (SimplePageTitle "Edit song") $ section $ do
-    postForm ("/songs/edit/" <> (T.pack . Relude.show $ song ^. #identifier)) $ do
+    postForm ("/songs/edit/" <> uuidToText (song ^. #identifier)) $ do
       requiredTextInput' "displayName" "song name" (Just $ song ^. #displayName)
       optionalTextArea' "description" "description" (song ^. #description)
       optionalTextInput' "spotifyUrl" "spotify URL" (song ^. #spotifyUrl)
@@ -155,10 +147,10 @@ songEditPage' env vv song = do
       optionalTextInput' "albumInfoLink" "about the album" (song ^. #albumInfoLink)
       submitButton vv
 
-    entityArtworkForm vv "songs" (Relude.map (^. #artwork) . Map.elems $ song ^. #artworks)
+    entityArtworkForm vv "songs" (map (^. #artwork) . mapElems $ song ^. #artworks)
     hr
     entityNewArtworkForm vv "songs" (song ^. #identifier)
-    mapM_ (\c -> hr >> songContentsEditForm env vv (song ^. #identifier) c) (Map.elems $ song ^. #contents)
+    mapM_ (\c -> hr >> songContentsEditForm env vv (song ^. #identifier) c) (mapElems $ song ^. #contents)
     hr
     H.h2 "Create contents"
     songContentsCreateForm vv (song ^. #identifier)
@@ -171,18 +163,18 @@ songEditPage' env vv song = do
           -- dangerPostForm vv ("/songs/" <> (T.pack . Relude.show $ song ^. #identifier) <> "/artists/" <> (T.pack . Relude.show $ artistIdentifier) <> "/delete") $ do
           --   deleteButton vv
       )
-      (Map.elems $ song ^. #artists)
+      (mapElems $ song ^. #artists)
     songArtistForm vv (song ^. #identifier)
 
 songArtistForm :: ViewVars -> UUID -> Html
 songArtistForm vv songIdentifier = do
-  postForm ("/songs/" <> (T.pack . Relude.show $ songIdentifier) <> "/artists") $ do
+  postForm ("/songs/" <> uuidToText songIdentifier <> "/artists") $ do
     requiredTextInput "identifier" "artist identifier (UUID)"
     submitButton vv
 
 songContentsCreateForm :: ViewVars -> UUID -> Html
 songContentsCreateForm vv songIdentifier = do
-  postForm ("/songs/" <> (T.pack . Relude.show $ songIdentifier) <> "/contents") $ do
+  postForm ("/songs/" <> (packText . show $ songIdentifier) <> "/contents") $ do
     requiredTextInput "versionName" "version name"
     requiredTextInput "instrumentType" "instrument type"
     optionalMonoArea "asciiLegend" "ascii legend"
@@ -197,16 +189,16 @@ songContentsEditForm _ vv songIdentifier content' = do
   dangerPostForm
     vv
     ( "/songs/contents/"
-        <> (T.pack . Relude.show $ content' ^. #identifier)
+        <> (packText . show $ content' ^. #identifier)
         <> "/delete"
     )
     $ do
       deleteButton vv
   postForm
     ( "/songs/"
-        <> (T.pack . Relude.show $ songIdentifier)
+        <> (packText . show $ songIdentifier)
         <> "/contents/"
-        <> (T.pack . Relude.show $ content' ^. #identifier)
+        <> (packText . show $ content' ^. #identifier)
     )
     $ do
       requiredTextInput' "versionName" "version name" (Just $ content' ^. #versionName)

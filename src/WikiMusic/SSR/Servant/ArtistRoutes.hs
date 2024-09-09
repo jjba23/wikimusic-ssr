@@ -2,31 +2,17 @@
 
 module WikiMusic.SSR.Servant.ArtistRoutes where
 
-import Control.Monad.Error.Class
-import Data.ByteString.Lazy qualified as BL
-import Data.Map qualified as Map
-import Data.Maybe qualified
-import Data.Text qualified as T
-import Data.UUID (UUID)
-import Free.AlaCarte
-import Optics
-import Relude
+import Principium
 import Servant
 import Servant.Multipart
-import Text.Blaze.Html as Html
 import WikiMusic.Interaction.Model.Artist
 import WikiMusic.Model.Artist
 import WikiMusic.Model.Other
 import WikiMusic.SSR.Backend.Rest ()
 import WikiMusic.SSR.Free.Backend
 import WikiMusic.SSR.Free.View
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Env
 import WikiMusic.SSR.Servant.Utilities
 import WikiMusic.SSR.View.Html ()
-
-debugPrint :: (MonadIO m, Show p) => p -> m ()
-debugPrint a = liftIO $ BL.putStr . fromString . Relude.show $ a
 
 artistsRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> Maybe Int -> Maybe Int -> Maybe Text -> m Html
 artistsRoute env cookie givenSortOrder limit offset searchInput = do
@@ -71,7 +57,6 @@ artistRoute env cookie identifier = do
             (vv ^. #authToken)
             identifier
         )
-  debugPrint maybeArtists
   respondWithViewOrErr
     maybeArtists
     (exec @View . artistDetailPage env vv)
@@ -86,8 +71,7 @@ artistCreateRoute env cookie = do
 
 artistCreateFormRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> MultipartData tag -> m a
 artistCreateFormRoute env cookie multipartData = do
-  createResult <- liftIO $ exec @Backend (createArtist env (vv ^. #authToken) r)
-  _ <- liftIO $ BL.putStr (fromString . Relude.show $ createResult)
+  _ <- liftIO $ exec @Backend (createArtist env (vv ^. #authToken) r)
   respondWithHttp
     httpFound
       { cause = Just "Created artist!",
@@ -111,8 +95,8 @@ artistCreateFormRoute env cookie multipartData = do
 
 artistLikeRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> UUID -> m a
 artistLikeRoute env cookie maybeReferer identifier = do
-  res <- liftIO $ exec @Backend (upsertArtistOpinion env (vv ^. #authToken) r)
-  _ <- liftIO $ BL.putStr (fromString . Relude.show $ res)
+  _ <- liftIO $ exec @Backend (upsertArtistOpinion env (vv ^. #authToken) r)
+
   respondWithHttp
     httpFound
       { cause = Just "Liked artist!",
@@ -132,8 +116,7 @@ artistLikeRoute env cookie maybeReferer identifier = do
 
 artistDislikeRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> UUID -> m a
 artistDislikeRoute env cookie maybeReferer identifier = do
-  res <- liftIO $ exec @Backend (upsertArtistOpinion env (vv ^. #authToken) r)
-  _ <- liftIO $ BL.putStr (fromString . Relude.show $ res)
+  _ <- liftIO $ exec @Backend (upsertArtistOpinion env (vv ^. #authToken) r)
   respondWithHttp
     httpFound
       { cause = Just "Disliked artist!",
@@ -161,21 +144,21 @@ artistEditRoute env cookie identifier = do
             (vv ^. #authToken)
             identifier
         )
-  let a = second (\x -> (head . Data.Maybe.fromJust . nonEmpty) $ Map.elems $ x ^. #artists) maybeArtists
-  respondWithViewOrErr
-    a
-    (exec @View . artistEditPage env vv)
+  let maybeArtistList = second (\x -> nonEmpty $ mapElems $ x ^. #artists) maybeArtists
+
+  respondWithViewOrErr'
+    maybeArtistList
+    (exec @View . artistEditPage env vv . head)
   where
     vv = vvFromCookies cookie
 
 artistEditFormRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> UUID -> MultipartData tag -> m a
 artistEditFormRoute env cookie maybeReferer identifier multipartData = do
-  editResult <- liftIO $ exec @Backend (editArtist env (vv ^. #authToken) r)
-  _ <- debugPrint editResult
+  _ <- liftIO $ exec @Backend (editArtist env (vv ^. #authToken) r)
   respondWithHttp
     httpFound
       { cause = Just "Updated artist!",
-        headers = [withLocation (maybe "/artists" (T.replace "/edit" "") maybeReferer)]
+        headers = [withLocation (maybe "/artists" (replaceText "/edit" "") maybeReferer)]
       }
   where
     vv = vvFromCookies cookie
@@ -220,7 +203,7 @@ createArtistArtworkRoute env cookie maybeReferer identifier multipartData = do
         { artistArtworks =
             [ InsertArtistArtworksRequestItem
                 { artistIdentifier = identifier,
-                  orderValue = fromMaybe 0 $ readMaybe (T.unpack . fromMaybe "0" $ maybeFromForm multipartData "orderValue"),
+                  orderValue = fromMaybe 0 $ readMaybe (unpackText . fromMaybe "0" $ maybeFromForm multipartData "orderValue"),
                   contentUrl = fromMaybe "" $ maybeFromForm multipartData "contentUrl",
                   contentCaption = maybeFromForm multipartData "contentCaption"
                 }
@@ -229,8 +212,8 @@ createArtistArtworkRoute env cookie maybeReferer identifier multipartData = do
 
 artistDeleteRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> UUID -> m a
 artistDeleteRoute env cookie identifier = do
-  res <- liftIO $ exec @Backend (deleteArtist env (vv ^. #authToken) identifier)
-  _ <- liftIO $ BL.putStr (fromString . Relude.show $ res)
+  _ <- liftIO $ exec @Backend (deleteArtist env (vv ^. #authToken) identifier)
+
   respondWithHttp
     httpFound
       { cause = Just "Deleted artist!",
@@ -265,7 +248,7 @@ updateArtistArtworkOrderRoute env cookie maybeReferer identifier multipartData =
         { artistArtworkOrders =
             [ ArtistArtworkOrderUpdate
                 { identifier = identifier,
-                  orderValue = fromMaybe 0 $ readMaybe (T.unpack . fromMaybe "0" $ maybeFromForm multipartData "orderValue")
+                  orderValue = fromMaybe 0 $ readMaybe (unpackText . fromMaybe "0" $ maybeFromForm multipartData "orderValue")
                 }
             ]
         }

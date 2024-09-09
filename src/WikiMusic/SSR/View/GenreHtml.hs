@@ -13,7 +13,7 @@ where
 import Data.Map qualified as Map
 import Data.Text qualified as T
 import Principium
-import Text.Blaze.Html5 as H
+import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import WikiMusic.Interaction.Model.Genre
 import WikiMusic.SSR.View.Components.Forms
@@ -34,7 +34,7 @@ genreListPage' env vv xs =
   where
     sortedXs =
       mapMaybe
-        (\identifier -> (xs ^. #genres) Map.!? identifier)
+        (\identifier -> (xs ^. #genres) Principium.!? identifier)
         (xs ^. #sortOrder)
 
 genreDetailPage' :: (MonadIO m) => Env -> ViewVars -> Genre -> m Html
@@ -68,6 +68,6 @@ genreEditPage' env vv genre =
         optionalTextInput' "soundcloudUrl" "soundcloud URL" (genre ^. #soundcloudUrl)
 
         submitButton vv
-    entityArtworkForm vv "genres" (Relude.map (^. #artwork) . Map.elems $ genre ^. #artworks)
+    entityArtworkForm vv "genres" (map (^. #artwork) . Map.elems $ genre ^. #artworks)
     hr
     entityNewArtworkForm vv "genres" (genre ^. #identifier)

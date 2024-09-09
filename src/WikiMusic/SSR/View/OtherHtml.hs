@@ -15,22 +15,19 @@ errorPage' :: (MonadIO m) => Env -> ViewVars -> Maybe Int -> Maybe Text -> m Htm
 errorPage' env vv _ maybeMessage = do
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ section $ do
     h3 . text $ messageCauses
-    let maybeDecoded = fmap decoder maybeMessage
+    let maybeDecoded = fmap maybeDecodeBase16 maybeMessage
     H.pre
       ! class_ "font-size-small"
       $ do
         case maybeDecoded of
-          Nothing -> pure $ text "Unexpected Error!"
-          Just maybeDecodedError -> pure $ decoder2 maybeDecodedError
-      $ text (either "Error ocurred!" (T.pack . show . maybeDecodeUtf8) decoder)
+          Nothing -> text "Unexpected Error!"
+          Just maybeDecodedError -> decoder2 maybeDecodedError
   where
-    decoder = maybeDecodeBase16 . fromString . T.unpack
-
     messageCauses = T.intercalate " - " causeStrings
     causeStrings = catMaybes [Just "Error", if T.isInfixOf "504" (fromMaybe "Error ocurred!" maybeMessage) then Just "Gateway Timeout" else Nothing]
 
 decoder2 :: Either String ByteString -> Html
-decoder2 maybeDecodedError = either (pure $ text "UnexpectedError!") (text . T.pack . decodeUtf8) maybeDecodedError
+decoder2 = either (pure $ text "Unexpected Error!") (text . T.pack . decodeUtf8)
 
 loginPage' :: (MonadIO m) => Env -> ViewVars -> m Html
 loginPage' env vv = do

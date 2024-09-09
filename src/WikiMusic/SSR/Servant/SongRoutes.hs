@@ -3,26 +3,15 @@
 
 module WikiMusic.SSR.Servant.SongRoutes where
 
-import Control.Monad.Error.Class
-import Data.ByteString.Lazy qualified as BL
-import Data.Map qualified as Map
-import Data.Maybe qualified
-import Data.Text qualified as T
-import Data.UUID (UUID)
-import Free.AlaCarte
-import Optics
-import Relude
+import Principium
 import Servant
 import Servant.Multipart
-import Text.Blaze.Html as Html
 import WikiMusic.Interaction.Model.Song
 import WikiMusic.Model.Other
 import WikiMusic.Model.Song
 import WikiMusic.SSR.Backend.Rest ()
 import WikiMusic.SSR.Free.Backend
 import WikiMusic.SSR.Free.View
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Env
 import WikiMusic.SSR.Servant.Utilities
 import WikiMusic.SSR.View.Html ()
 
@@ -84,7 +73,6 @@ songCreateRoute env cookie = do
 songCreateFormRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> MultipartData tag -> m a
 songCreateFormRoute env cookie multipartData = do
   createResult <- liftIO $ exec @Backend (createSong env (vv ^. #authToken) r)
-  _ <- liftIO $ BL.putStr (fromString . Relude.show $ createResult)
   respondWithHttp
     httpFound
       { cause = Just "Created song!",
@@ -114,7 +102,6 @@ songCreateFormRoute env cookie multipartData = do
 songLikeRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> UUID -> m a
 songLikeRoute env cookie maybeReferer identifier = do
   res <- liftIO $ exec @Backend (upsertSongOpinion env (vv ^. #authToken) r)
-  _ <- liftIO $ BL.putStr (fromString . Relude.show $ res)
   respondWithHttp
     httpFound
       { cause = Just "Liked song!",
@@ -162,10 +149,10 @@ songEditRoute env cookie identifier = do
             (vv ^. #authToken)
             identifier
         )
-  let a = second (\x -> (head . Data.Maybe.fromJust . nonEmpty) $ Map.elems $ x ^. #songs) maybeSongs
-  respondWithViewOrErr
+  let a = second (\x -> nonEmpty $ mapElems $ x ^. #songs) maybeSongs
+  respondWithViewOrErr'
     a
-    (exec @View . songEditPage env vv)
+    (exec @View . songEditPage env vv . head)
   where
     vv = vvFromCookies cookie
 
@@ -175,7 +162,7 @@ songEditFormRoute env cookie maybeReferer identifier multipartData = do
   respondWithHttp
     httpFound
       { cause = Just "Edited song!",
-        headers = [withLocation (maybe "/songs" (T.replace "/edit" "") maybeReferer)]
+        headers = [withLocation (maybe "/songs" (replaceText "/edit" "") maybeReferer)]
       }
   where
     vv = vvFromCookies cookie
@@ -225,7 +212,7 @@ createSongArtworkRoute env cookie maybeReferer identifier multipartData = do
         { songArtworks =
             [ InsertSongArtworksRequestItem
                 { songIdentifier = identifier,
-                  orderValue = fromMaybe 0 $ readMaybe (T.unpack . fromMaybe "0" $ maybeFromForm multipartData "orderValue"),
+                  orderValue = fromMaybe 0 $ readMaybe (unpackText . fromMaybe "0" $ maybeFromForm multipartData "orderValue"),
                   contentUrl = fromMaybe "" $ maybeFromForm multipartData "contentUrl",
                   contentCaption = maybeFromForm multipartData "contentCaption"
                 }
@@ -271,7 +258,7 @@ updateSongArtworkOrderRoute env cookie maybeReferer identifier multipartData = d
                 { identifier = identifier,
                   orderValue =
                     fromMaybe 0
-                      $ readMaybe (T.unpack . fromMaybe "0" $ maybeFromForm multipartData "orderValue")
+                      $ readMaybe (unpackText . fromMaybe "0" $ maybeFromForm multipartData "orderValue")
                 }
             ]
         }
@@ -289,7 +276,7 @@ songContentCreateFormRoute env cookie maybeReferer identifier multipartData = do
   respondWithHttp
     httpFound
       { cause = Just "Edited song!",
-        headers = [withLocation (maybe "/songs" (T.replace "/edit" "" . (<> "#edit-contents")) maybeReferer)]
+        headers = [withLocation (maybe "/songs" (replaceText "/edit" "" . (<> "#edit-contents")) maybeReferer)]
       }
   where
     vv = vvFromCookies cookie
@@ -322,7 +309,7 @@ songContentEditFormRoute env cookie maybeReferer _ songContentIdentifier multipa
   respondWithHttp
     httpFound
       { cause = Just "Edited song!",
-        headers = [withLocation (maybe "/songs" (T.replace "/edit" "") maybeReferer)]
+        headers = [withLocation (maybe "/songs" (replaceText "/edit" "") maybeReferer)]
       }
   where
     vv = vvFromCookies cookie

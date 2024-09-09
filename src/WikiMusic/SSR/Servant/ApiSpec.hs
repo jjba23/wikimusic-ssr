@@ -1,11 +1,9 @@
 module WikiMusic.SSR.Servant.ApiSpec where
 
-import Data.UUID (UUID)
-import Relude
+import Principium
 import Servant
 import Servant.HTML.Blaze as ServantBlaze
 import Servant.Multipart
-import Text.Blaze.Html as Html
 import WikiMusic.SSR.Backend.Rest ()
 import WikiMusic.SSR.View.Html ()
 
