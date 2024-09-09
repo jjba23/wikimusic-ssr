@@ -23,8 +23,8 @@ genresRoute env cookie givenSortOrder limit offset searchInput = do
           ( getGenres
               env
               (vv ^. #authToken)
-              (maybe (Limit 50) Limit limit)
-              (maybe (Offset 0) Offset offset)
+              limit'
+              offset'
               sortOrder
               (Include {value = "artworks,comments,opinions"})
           )
@@ -35,18 +35,20 @@ genresRoute env cookie givenSortOrder limit offset searchInput = do
               env
               (vv ^. #authToken)
               search
-              (maybe (Limit 50) Limit limit)
-              (maybe (Offset 0) Offset offset)
+              limit'
+              offset'
               sortOrder
               (Include {value = "artworks,comments,opinions"})
           )
 
   respondWithViewOrErr
     maybeGenres
-    (exec @View . genreListPage env vv)
+    (exec @View . genreListPage limit' offset' env vv)
   where
     vv = vvFromCookies cookie
     sortOrder = maybe (vv ^. #genreSorting) SortOrder givenSortOrder
+    limit' = maybe (Limit 25) Limit limit
+    offset' = maybe (Offset 0) Offset offset
 
 genreRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> UUID -> m Html
 genreRoute env cookie identifier = do

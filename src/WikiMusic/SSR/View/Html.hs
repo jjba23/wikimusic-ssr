@@ -13,8 +13,8 @@ import WikiMusic.SSR.View.SongHtml
 
 instance Exec View where
   -- artists
-  execAlgebra (ArtistListPage env vv r next) =
-    next =<< artistListPage' env vv r
+  execAlgebra (ArtistListPage limit offset env vv r next) =
+    next =<< artistListPage' limit offset env vv r
   execAlgebra (ArtistDetailPage env vv r next) = do
     let maybeArtist = fmap head . nonEmpty . Map.elems $ r ^. #artists
     next =<< maybe (errorPage' env vv Nothing Nothing) (artistDetailPage' env vv) maybeArtist
@@ -23,8 +23,8 @@ instance Exec View where
   execAlgebra (ArtistEditPage env vv artist next) =
     next =<< artistEditPage' env vv artist
   -- genres
-  execAlgebra (GenreListPage env vv r next) =
-    next =<< genreListPage' env vv r
+  execAlgebra (GenreListPage limit offset env vv r next) =
+    next =<< genreListPage' limit offset env vv r
   execAlgebra (GenreDetailPage env vv r next) = do
     let maybeGenre = fmap head . nonEmpty . Map.elems $ r ^. #genres
     next =<< maybe (errorPage' env vv Nothing Nothing) (genreDetailPage' env vv) maybeGenre
@@ -33,8 +33,8 @@ instance Exec View where
   execAlgebra (GenreEditPage env vv genre next) =
     next =<< genreEditPage' env vv genre
   -- songs
-  execAlgebra (SongListPage env vv r next) =
-    next =<< songListPage' env vv r
+  execAlgebra (SongListPage limit offset env vv r next) =
+    next =<< songListPage' limit offset env vv r
   execAlgebra (SongDetailPage env vv r next) = do
     let maybeSong = fmap head . nonEmpty . Map.elems $ r ^. #songs
     next =<< maybe (errorPage' env vv Nothing Nothing) (songDetailPage' env vv) maybeSong

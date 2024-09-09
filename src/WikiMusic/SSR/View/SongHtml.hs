@@ -20,8 +20,8 @@ import WikiMusic.SSR.View.Components.Forms
 import WikiMusic.SSR.View.Components.Other
 import WikiMusic.SSR.View.HtmlUtil
 
-songListPage' :: (MonadIO m) => Env -> ViewVars -> GetSongsQueryResponse -> m Html
-songListPage' env vv xs =
+songListPage' :: (MonadIO m) => Limit -> Offset -> Env -> ViewVars -> GetSongsQueryResponse -> m Html
+songListPage' limit offset env vv xs =
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ do
     searchForm "/songs/search" $ do
       searchInput "searchInput"
@@ -30,6 +30,9 @@ songListPage' env vv xs =
       H.a ! href "/songs/create" $ button $ H.small "+ new song"
       mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
     section ! class_ "flex direction-row justify-content-center gap-small" $ mapM_ (simpleEntityCard vv "songs") sortedXs
+    section ! class_ "flex direction-row justify-content-center gap-medium" $ do
+      maybePrevPaginationButton limit offset (length (xs ^. #songs))
+      maybeNextPaginationButton limit offset (length (xs ^. #songs))
   where
     sortedXs =
       mapMaybe

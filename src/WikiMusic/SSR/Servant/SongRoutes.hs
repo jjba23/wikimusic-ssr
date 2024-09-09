@@ -24,8 +24,8 @@ songsRoute env cookie givenSortOrder limit offset searchInput = do
           ( getSongs
               env
               (vv ^. #authToken)
-              (maybe (Limit 50) Limit limit)
-              (maybe (Offset 0) Offset offset)
+              limit'
+              offset'
               sortOrder
               (Include {value = "artworks,comments,opinions,artists"})
           )
@@ -36,17 +36,19 @@ songsRoute env cookie givenSortOrder limit offset searchInput = do
               env
               (vv ^. #authToken)
               search
-              (maybe (Limit 50) Limit limit)
-              (maybe (Offset 0) Offset offset)
+              limit'
+              offset'
               sortOrder
               (Include {value = "artworks,comments,opinions,artists"})
           )
   respondWithViewOrErr
     maybeSongs
-    (exec @View . songListPage env vv)
+    (exec @View . songListPage limit' offset' env vv)
   where
     vv = vvFromCookies cookie
     sortOrder = maybe (vv ^. #songSorting) SortOrder givenSortOrder
+    limit' = maybe (Limit 25) Limit limit
+    offset' = maybe (Offset 0) Offset offset
 
 songRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> UUID -> m Html
 songRoute env cookie identifier = do

@@ -16,12 +16,13 @@ import Principium
 import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import WikiMusic.Interaction.Model.Genre
+import WikiMusic.Model.Other
 import WikiMusic.SSR.View.Components.Forms
 import WikiMusic.SSR.View.Components.Other
 import WikiMusic.SSR.View.HtmlUtil
 
-genreListPage' :: (MonadIO m) => Env -> ViewVars -> GetGenresQueryResponse -> m Html
-genreListPage' env vv xs =
+genreListPage' :: (MonadIO m) => Limit -> Offset -> Env -> ViewVars -> GetGenresQueryResponse -> m Html
+genreListPage' limit offset env vv xs =
   simplePage env vv (SimplePageTitle $ (^. #titles % #genresPage) |##| (vv ^. #language)) $ do
     section $ do
       searchForm "/genres/search" $ do
@@ -31,6 +32,9 @@ genreListPage' env vv xs =
         H.a ! href "/genres/create" $ button $ H.small "+ new genre"
         mkSortingForm vv (vv ^. #genreSorting) "/user-preferences/genre-sorting" "genre-sorting"
       section ! class_ "flex direction-row justify-content-center gap-small" $ mapM_ (simpleEntityCard vv "genres") sortedXs
+      section ! class_ "flex direction-row justify-content-center gap-medium" $ do
+        maybePrevPaginationButton limit offset (length (xs ^. #genres))
+        maybeNextPaginationButton limit offset (length (xs ^. #genres))
   where
     sortedXs =
       mapMaybe

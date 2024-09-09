@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoFieldSelectors #-}
@@ -10,6 +11,7 @@ module WikiMusic.SSR.View.HtmlUtil where
 import Principium
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
+import WikiMusic.Model.Other
 import WikiMusic.SSR.View.Components.Footer
 import WikiMusic.SSR.View.Components.PageTop
 
@@ -46,3 +48,43 @@ simplePage env vv title' body' = do
       sharedPageTop Nothing vv
       (H.h2 ! A.class_ "margin-top-small page-title") . text $ title' ^. #value
       body'
+
+maybeNextPaginationButton :: Limit -> Offset -> Int -> Html
+maybeNextPaginationButton _ _ 0 = pure ()
+maybeNextPaginationButton (Limit 0) _ _ = pure ()
+maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
+  when (itemSize == limit)
+    $ (H.button ! onclick (fromTextToAttributeValue func))
+    . H.small
+    $ "next >"
+  where
+    offset' = show offset
+    newOffset = show $ offset + limit
+    func =
+      replaceText
+        "\n"
+        ""
+        [trimming|(function(){
+                 if(/^offset$/.test(window.location)){
+                   window.location = window.location.replace("offset=$offset'", "offset=$newOffset");
+                   }else{
+                   window.location = window.location + "?offset=$newOffset";
+                   }
+                 })()|]
+
+maybePrevPaginationButton :: Limit -> Offset -> Int -> Html
+maybePrevPaginationButton (Limit 0) _ _ = pure ()
+maybePrevPaginationButton _ (Offset 0) _ = pure ()
+maybePrevPaginationButton (Limit limit) (Offset offset) itemSize =
+  when (itemSize == limit)
+    $ (H.button ! onclick (fromTextToAttributeValue func))
+    . H.small
+    $ "< prev"
+  where
+    offset' = show offset
+    newOffset = show $ offset - limit
+    func =
+      replaceText
+        "\n"
+        ""
+        [trimming|(function(){window.location = window.location.replace("offset=$offset'", "offset=$newOffset")})()|]

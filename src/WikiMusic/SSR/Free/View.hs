@@ -1,25 +1,21 @@
 module WikiMusic.SSR.Free.View where
 
-import Free.AlaCarte
-import Relude
-import Text.Blaze.Html
+import Principium
 import WikiMusic.Interaction.Model.Artist
 import WikiMusic.Interaction.Model.Genre
 import WikiMusic.Interaction.Model.Song
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Env
 
 type View :: Type -> Type
 data View a
-  = ArtistListPage Env ViewVars GetArtistsQueryResponse (Html -> a)
+  = ArtistListPage Limit Offset Env ViewVars GetArtistsQueryResponse (Html -> a)
   | ArtistDetailPage Env ViewVars GetArtistsQueryResponse (Html -> a)
   | ArtistCreatePage Env ViewVars (Html -> a)
   | ArtistEditPage Env ViewVars Artist (Html -> a)
-  | GenreListPage Env ViewVars GetGenresQueryResponse (Html -> a)
+  | GenreListPage Limit Offset Env ViewVars GetGenresQueryResponse (Html -> a)
   | GenreDetailPage Env ViewVars GetGenresQueryResponse (Html -> a)
   | GenreCreatePage Env ViewVars (Html -> a)
   | GenreEditPage Env ViewVars Genre (Html -> a)
-  | SongListPage Env ViewVars GetSongsQueryResponse (Html -> a)
+  | SongListPage Limit Offset Env ViewVars GetSongsQueryResponse (Html -> a)
   | SongDetailPage Env ViewVars GetSongsQueryResponse (Html -> a)
   | SongCreatePage Env ViewVars (Html -> a)
   | SongEditPage Env ViewVars Song (Html -> a)
@@ -30,8 +26,8 @@ data View a
   | InviteUsersPage Env ViewVars (Html -> a)
   deriving (Functor)
 
-artistListPage :: (View :<: f) => Env -> ViewVars -> GetArtistsQueryResponse -> Free f Html
-artistListPage env vv artists = injectFree (ArtistListPage env vv artists Pure)
+artistListPage :: (View :<: f) => Limit -> Offset -> Env -> ViewVars -> GetArtistsQueryResponse -> Free f Html
+artistListPage limit offset env vv artists = injectFree (ArtistListPage limit offset env vv artists Pure)
 
 artistDetailPage :: (View :<: f) => Env -> ViewVars -> GetArtistsQueryResponse -> Free f Html
 artistDetailPage env vv artists = injectFree (ArtistDetailPage env vv artists Pure)
@@ -42,8 +38,8 @@ artistCreatePage env vv = injectFree (ArtistCreatePage env vv Pure)
 artistEditPage :: (View :<: f) => Env -> ViewVars -> Artist -> Free f Html
 artistEditPage env vv artist = injectFree (ArtistEditPage env vv artist Pure)
 
-genreListPage :: (View :<: f) => Env -> ViewVars -> GetGenresQueryResponse -> Free f Html
-genreListPage env vv genres = injectFree (GenreListPage env vv genres Pure)
+genreListPage :: (View :<: f) => Limit -> Offset -> Env -> ViewVars -> GetGenresQueryResponse -> Free f Html
+genreListPage limit offset env vv genres = injectFree (GenreListPage limit offset env vv genres Pure)
 
 genreDetailPage :: (View :<: f) => Env -> ViewVars -> GetGenresQueryResponse -> Free f Html
 genreDetailPage env vv genres = injectFree (GenreDetailPage env vv genres Pure)
@@ -54,8 +50,8 @@ genreCreatePage env vv = injectFree (GenreCreatePage env vv Pure)
 genreEditPage :: (View :<: f) => Env -> ViewVars -> Genre -> Free f Html
 genreEditPage env vv genre = injectFree (GenreEditPage env vv genre Pure)
 
-songListPage :: (View :<: f) => Env -> ViewVars -> GetSongsQueryResponse -> Free f Html
-songListPage env vv songs = injectFree (SongListPage env vv songs Pure)
+songListPage :: (View :<: f) => Limit -> Offset -> Env -> ViewVars -> GetSongsQueryResponse -> Free f Html
+songListPage limit offset env vv songs = injectFree (SongListPage limit offset env vv songs Pure)
 
 songDetailPage :: (View :<: f) => Env -> ViewVars -> GetSongsQueryResponse -> Free f Html
 songDetailPage env vv songs = injectFree (SongDetailPage env vv songs Pure)

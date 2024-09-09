@@ -2,6 +2,8 @@ module Principium
   ( --
     module Relude,
     module Optics,
+    module WikiMusic.Model.Other,
+    module NeatInterpolation,
     BlazeHtml.Html,
     module WikiMusic.SSR.Language,
     module WikiMusic.SSR.Model.Api,
@@ -41,9 +43,11 @@ import Data.Text qualified as T
 import Data.Time
 import Data.UUID qualified as UUID
 import Free.AlaCarte
+import NeatInterpolation hiding (text)
 import Optics hiding (uncons)
 import Relude hiding (ByteString)
 import Text.Blaze.Html as BlazeHtml
+import WikiMusic.Model.Other
 import WikiMusic.SSR.Language
 import WikiMusic.SSR.Model.Api
 import WikiMusic.SSR.Model.Config
