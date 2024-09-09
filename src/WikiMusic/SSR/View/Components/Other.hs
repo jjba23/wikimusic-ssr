@@ -48,8 +48,7 @@ simpleEntityCard vv path entity = article $ do
   maybeImg
   a
     ! href (mkIdentifierHref path (entity ^. #identifier))
-    ! class_ "margin-top-large"
-    $ (h3 ! class_ "highlight-header text-align-center")
+    $ (h3 ! class_ "text-2xl font-bold")
     . text
     $ entity
     ^. #displayName

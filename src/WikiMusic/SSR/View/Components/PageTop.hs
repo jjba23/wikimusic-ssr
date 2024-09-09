@@ -30,10 +30,10 @@ myNav :: ViewVars -> Html
 myNav vv = do
   hr
   nav ! class_ "flex flex-wrap flex-row justify-center gap-8" $ do
-    a ! href "/songs" $ text ((^. #more % #songsNav) |##| (vv ^. #language))
-    a ! href "/artists" $ text ((^. #more % #artistsNav) |##| (vv ^. #language))
-    a ! href "/genres" $ text ((^. #more % #genresNav) |##| (vv ^. #language))
-    a ! href "/login" $ text ((^. #more % #loginNav) |##| (vv ^. #language))
+    a ! class_ "text-lg font-bold" ! href "/songs" $ text ((^. #more % #songsNav) |##| (vv ^. #language))
+    a ! class_ "text-lg font-bold" ! href "/artists" $ text ((^. #more % #artistsNav) |##| (vv ^. #language))
+    a ! class_ "text-lg font-bold" ! href "/genres" $ text ((^. #more % #genresNav) |##| (vv ^. #language))
+    a ! class_ "text-lg font-bold" ! href "/login" $ text ((^. #more % #loginNav) |##| (vv ^. #language))
   hr
 
 userPrefs :: ViewVars -> Html
