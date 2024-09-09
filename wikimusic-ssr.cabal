@@ -1,7 +1,7 @@
 cabal-version: 1.12
 
 name:           wikimusic-ssr
-version:        1.0.0.0
+version:        1.0.0.1
 description:    Please see the README at <https://github.com/jjba23/wikimusic-ssr>
 homepage:       https://github.com/jjba23/wikimusic-ssr
 bug-reports:    https://github.com/jjba23/wikimusic-ssr/-/issues
@@ -14,8 +14,6 @@ license-file:   COPYING
                 
 extra-source-files:
     README.org
-    CHANGELOG.org
-
     
 source-repository head
   type: git
@@ -24,10 +22,11 @@ source-repository head
 
 library
   exposed-modules:
+      -- λ principium (beginning / prelude)
+      Principium
       -- λ main
       WikiMusic.SSR.Config
       WikiMusic.SSR.Boot
-      WikiMusic.SSR.Prelude
       WikiMusic.SSR.Clock.LiveClock
       WikiMusic.SSR.Console.Logger
       WikiMusic.SSR.Model.Config

@@ -12,15 +12,10 @@ where
 
 import Data.Map qualified as Map
 import Data.Text qualified as T
-import Optics
-import Relude
-import Text.Blaze.Html
-import Text.Blaze.Html5 as H
+import Principium
+import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import WikiMusic.Interaction.Model.Artist
-import WikiMusic.SSR.Language
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Env
 import WikiMusic.SSR.View.Components.Forms
 import WikiMusic.SSR.View.Components.Other
 import WikiMusic.SSR.View.HtmlUtil
@@ -75,6 +70,6 @@ artistEditPage' env vv artist = do
         optionalTextInput' "soundcloudUrl" "soundcloud URL" (artist ^. #soundcloudUrl)
         submitButton vv
 
-    entityArtworkForm vv "artists" (Relude.map (^. #artwork) . Map.elems $ artist ^. #artworks)
+    entityArtworkForm vv "artists" (map (^. #artwork) . Map.elems $ artist ^. #artworks)
     hr
     entityNewArtworkForm vv "artists" (artist ^. #identifier)

@@ -1,19 +1,16 @@
 {-# LANGUAGE OverloadedLabels #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module WikiMusic.SSR.View.Html () where
 
 import Data.Map qualified as Map
 import Free.AlaCarte
-import Optics
-import Relude
+import Principium
 import WikiMusic.SSR.Free.View
 import WikiMusic.SSR.View.ArtistHtml
 import WikiMusic.SSR.View.GenreHtml
 import WikiMusic.SSR.View.OtherHtml
 import WikiMusic.SSR.View.SongHtml
-import Prelude qualified
 
 instance Exec View where
   -- artists

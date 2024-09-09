@@ -9,11 +9,11 @@ import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Network.Wai
 import Network.Wai.Logger (ApacheLogger)
 import Network.Wai.Middleware.Cors
-import qualified Prometheus.Metric.GHC as P
-import qualified Prometheus as P
-import qualified Network.Wai.Middleware.Prometheus as P
+import Network.Wai.Middleware.Prometheus qualified as P
 import Network.Wai.Middleware.RequestLogger
 import Optics
+import Prometheus qualified as P
+import Prometheus.Metric.GHC qualified as P
 import Relude
 import Servant
 import Servant.Client

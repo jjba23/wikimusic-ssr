@@ -4,16 +4,10 @@
 
 module WikiMusic.SSR.View.OtherHtml where
 
-import Data.ByteString.Base16.Lazy qualified as B16
 import Data.Text qualified as T
-import Optics
-import Relude
-import Text.Blaze.Html
+import Principium
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
-import WikiMusic.SSR.Language
-import WikiMusic.SSR.Model.Api
-import WikiMusic.SSR.Model.Env
 import WikiMusic.SSR.View.Components.Forms
 import WikiMusic.SSR.View.HtmlUtil
 
@@ -21,12 +15,22 @@ errorPage' :: (MonadIO m) => Env -> ViewVars -> Maybe Int -> Maybe Text -> m Htm
 errorPage' env vv _ maybeMessage = do
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ section $ do
     h3 . text $ messageCauses
+    let maybeDecoded = fmap decoder maybeMessage
     H.pre
       ! class_ "font-size-small"
-      $ text (maybe "Error ocurred!" (decodeUtf8 . B16.decodeLenient . fromString . T.unpack) maybeMessage)
+      $ do
+        case maybeDecoded of
+          Nothing -> pure $ text "Unexpected Error!"
+          Just maybeDecodedError -> pure $ decoder2 maybeDecodedError
+      $ text (either "Error ocurred!" (T.pack . show . maybeDecodeUtf8) decoder)
   where
+    decoder = maybeDecodeBase16 . fromString . T.unpack
+
     messageCauses = T.intercalate " - " causeStrings
     causeStrings = catMaybes [Just "Error", if T.isInfixOf "504" (fromMaybe "Error ocurred!" maybeMessage) then Just "Gateway Timeout" else Nothing]
+
+decoder2 :: Either String ByteString -> Html
+decoder2 maybeDecodedError = either (pure $ text "UnexpectedError!") (text . T.pack . decodeUtf8) maybeDecodedError
 
 loginPage' :: (MonadIO m) => Env -> ViewVars -> m Html
 loginPage' env vv = do
@@ -68,5 +72,3 @@ inviteUserPage' env vv = do
         option ! value "wm::superuser" $ "super user"
       optionalTextArea "description" "description"
       submitButton vv
-
-

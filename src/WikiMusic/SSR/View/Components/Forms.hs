@@ -182,6 +182,7 @@ entityArtworkForm vv path xs = do
       let arts = sortBy (\x y -> compare (x ^. #orderValue) (y ^. #orderValue)) xs
       mapM_ (mkArtworkManager vv path) arts
 
+mkArtworkManager :: ViewVars -> Text -> Artwork -> Html
 mkArtworkManager vv path artwork = do
   H.div $ do
     img
