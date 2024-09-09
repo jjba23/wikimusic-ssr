@@ -19,24 +19,35 @@ newtype SimplePageTitle = SimplePageTitle {value :: Text} deriving (Eq, Show)
 makeFieldLabelsNoPrefix ''SimplePageTitle
 
 mkSharedHead :: (MonadIO m) => Env -> ViewVars -> SimplePageTitle -> m Html
-mkSharedHead env vv pageTitle = do
-  let style' = text (env ^. #mainCss)
-  let modeStyle =
-        if (vv ^. #uiMode % #value) == "dark"
-          then env ^. #darkCss
-          else env ^. #lightCss
-  let paletteStyle = case vv ^. #palette % #value of
-        "green" -> env ^. #palettes % #green
-        _ -> env ^. #palettes % #mauve
-
+mkSharedHead _ _ pageTitle = do
   pure $ H.head $ do
     H.meta ! charset "utf-8"
     H.meta ! lang "en"
     H.title . text $ (pageTitle ^. #value)
     meta ! name "viewport" ! content "width=device-width, initial-scale=1"
-    H.style . text $ modeStyle
-    H.style . text $ paletteStyle
-    H.style style'
+    H.style
+      . text
+      $ [trimming|
+                 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+                 @font-face {
+                   font-family: 'Iosevka Comfy Wide';
+                   src: url('https://raw.githubusercontent.com/protesilaos/iosevka-comfy/master/iosevka-comfy-wide/TTF/iosevka-comfy-wide-normalregularupright.ttf');
+                 }                              
+        |]
+    H.script ! src "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries" $ ""
+    H.script
+      . text
+      $ [trimming|
+      tailwind.config = {
+        theme: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Inter', 'serif'],
+            mono: ['Iosevka Comfy Wide', 'monospace']
+          },
+        }
+      }                              
+    |]
 
 simplePage :: (MonadIO m) => Env -> ViewVars -> SimplePageTitle -> Html -> m Html
 simplePage env vv title' body' = do

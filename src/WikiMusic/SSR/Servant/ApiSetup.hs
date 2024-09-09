@@ -46,36 +46,23 @@ newClientEnv cfg = do
 mkApp :: ApacheLogger -> AppConfig -> IO Application
 mkApp logger' cfg = do
   let apiCfg = EmptyContext
+
   now <- getZonedTime
-  mainCss <- liftIO (readFileBS "resources/css/main.css")
-  lightCss <- liftIO (readFileBS "resources/css/light.css")
-  darkCss <- liftIO (readFileBS "resources/css/dark.css")
-  greenPaletteCss <- liftIO (readFileBS "resources/css/palettes/green.css")
-  mauvePaletteCss <- liftIO (readFileBS "resources/css/palettes/mauve.css")
   clientEnv <- newClientEnv cfg
+
   let env =
         Env
           { logger = logger',
             cfg = cfg,
             processStartedAt = now,
             reportedVersion = cfg ^. #dev % #reportedVersion,
-            mainCss = prepareCSS mainCss,
-            darkCss = prepareCSS darkCss,
-            lightCss = prepareCSS lightCss,
-            clientEnv = clientEnv,
-            palettes =
-              PalettesCss
-                { green = prepareCSS greenPaletteCss,
-                  mauve = prepareCSS mauvePaletteCss
-                }
+            clientEnv = clientEnv
           }
   pure
     . (if (cfg ^. #dev % #reportedVersion) == "dev" then logStdoutDev else logStdout)
     . myCors (cfg ^. #cors)
     . P.prometheus P.def
     $ serveWithContext wikimusicSSRServant apiCfg (server env)
-  where
-    prepareCSS = filterText (\x -> x /= '\n' && x /= '\t') . decodeUtf8
 
 artistBaseEntityRoutes :: Env -> Server BaseEntityRoutes
 artistBaseEntityRoutes env =
