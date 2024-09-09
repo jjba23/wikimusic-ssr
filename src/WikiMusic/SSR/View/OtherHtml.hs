@@ -17,7 +17,6 @@ errorPage' env vv _ maybeMessage = do
     h3 . text $ messageCauses
     let maybeDecoded = fmap maybeDecodeBase16 maybeMessage
     H.pre
-      ! class_ "font-size-small"
       $ do
         case maybeDecoded of
           Nothing -> text "Unexpected Error!"
@@ -36,7 +35,7 @@ loginPage' env vv = do
       requiredEmailInput "email" ((^. #forms % #email) |##| (vv ^. #language))
       requiredPasswordInput "password" ((^. #forms % #password) |##| (vv ^. #language))
       submitButton vv
-    a ! class_ "accent-color" ! href "/passwords/request-reset" $ "forgot password ?"
+    a ! href "/passwords/request-reset" $ "forgot password ?"
 
 doPasswordResetPage' :: (MonadIO m) => Env -> ViewVars -> Maybe Text -> m Html
 doPasswordResetPage' env vv t = do

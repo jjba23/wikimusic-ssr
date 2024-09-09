@@ -11,7 +11,7 @@ sharedPageTop :: Maybe Text -> ViewVars -> Html
 sharedPageTop title' vv = do
   topTitle vv
   myNav vv
-  H.div ! class_ "flex direction-column" $ do
+  H.div $ do
     userPrefs vv
     -- warningBanner language
     maybeTitle title'
@@ -21,7 +21,6 @@ maybeTitle =
   mapM_
     ( \x ->
         H.div
-          ! class_ "text-align-center"
           $ (h2 ! class_ "font-weight-300 font-size-xx-large")
           . text
           $ x
@@ -30,16 +29,16 @@ maybeTitle =
 myNav :: ViewVars -> Html
 myNav vv = do
   hr
-  nav $ ol $ do
-    li $ a ! class_ "nav-link scale-on-hover" ! href "/songs" $ text ((^. #more % #songsNav) |##| (vv ^. #language))
-    li $ a ! class_ "nav-link scale-on-hover" ! href "/artists" $ text ((^. #more % #artistsNav) |##| (vv ^. #language))
-    li $ a ! class_ "nav-link scale-on-hover" ! href "/genres" $ text ((^. #more % #genresNav) |##| (vv ^. #language))
-    li $ a ! class_ "nav-link scale-on-hover" ! href "/login" $ text ((^. #more % #loginNav) |##| (vv ^. #language))
+  nav ! class_ "flex flex-wrap flex-row justify-center gap-8" $ do
+    a ! href "/songs" $ text ((^. #more % #songsNav) |##| (vv ^. #language))
+    a ! href "/artists" $ text ((^. #more % #artistsNav) |##| (vv ^. #language))
+    a ! href "/genres" $ text ((^. #more % #genresNav) |##| (vv ^. #language))
+    a ! href "/login" $ text ((^. #more % #loginNav) |##| (vv ^. #language))
   hr
 
 userPrefs :: ViewVars -> Html
 userPrefs vv = do
-  H.div ! class_ "flex direction-row justify-content-center gap-small" $ do
+  H.div $ do
     H.div
       $ H.form
       ! action "/user-preferences/locale"
@@ -64,7 +63,7 @@ userPrefs vv = do
 
 topTitle :: ViewVars -> Html
 topTitle vv = do
-  section ! class_ "flex direction-column flex items-center" $ do
+  section $ do
     a
       ! href "/songs"
       $ h1

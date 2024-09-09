@@ -40,6 +40,7 @@ mkSharedHead _ _ pageTitle = do
       $ [trimming|
       tailwind.config = {
         theme: {
+          container: { center: true },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
             serif: ['Inter', 'serif'],
@@ -56,7 +57,7 @@ simplePage env vv title' body' = do
     sharedHead
     bodyWithFooter vv $ do
       sharedPageTop Nothing vv
-      (H.h2 ! A.class_ "margin-top-small page-title") . text $ title' ^. #value
+      H.h2 . text $ title' ^. #value
       body'
 
 maybeNextPaginationButton :: Limit -> Offset -> Int -> Html

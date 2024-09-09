@@ -44,7 +44,7 @@ dislikeCount entity =
 mkIdentifierHref :: Text -> UUID -> AttributeValue
 mkIdentifierHref path identifier = fromString ("/" <> T.unpack path <> "/" <> show identifier)
 
-simpleEntityCard vv path entity = article ! class_ "simple-entity-card" $ do
+simpleEntityCard vv path entity = article $ do
   maybeImg
   a
     ! href (mkIdentifierHref path (entity ^. #identifier))
@@ -65,18 +65,18 @@ simpleEntityCard vv path entity = article ! class_ "simple-entity-card" $ do
       a
         ! href (mkIdentifierHref path (entity ^. #identifier))
         $ img
-        ! class_ "simple-image"
+        ! class_ "object-cover w-60 h-60 rounded-2xl"
         ! customAttribute "loading" "lazy"
         ! src (fromString . T.unpack $ x ^. #contentUrl)
 
 imageCarousel :: [Artwork] -> Html
 imageCarousel artworks =
-  section ! class_ "slider" $ do
+  section ! class_ "flex flex-wrap flex-col gap-6" $ do
     mapM_
       ( \x ->
-          H.div ! A.class_ "flex direction-column gap-tiny" $ do
+          H.div $ do
             img
-              ! class_ "simple-image-larger"
+              ! class_ "object-cover w-80 h-80 rounded-2xl"
               ! customAttribute "loading" "lazy"
               ! src (fromString . T.unpack $ x ^. #contentUrl)
             mapM_ (H.span . text) (x ^. #contentCaption)
@@ -85,16 +85,16 @@ imageCarousel artworks =
 
 entityDetailsSkeleton :: Html -> Html -> Html
 entityDetailsSkeleton slot0 slot1 =
-  H.div ! class_ "flex direction-row gap-tiny justify-content-space-evenly" $ do
-    H.div ! class_ "col padding-medium" $ do
+  H.div $ do
+    H.div $ do
       slot0
-    H.div ! class_ "col padding-small" $ do
+    H.div $ do
       slot1
 
 entityDetails language path x =
   entityDetailsSkeleton slot0 slot1
   where
-    verboseLink' uri = a ! class_ "accent-color" ! href (fromString . T.unpack $ uri) $ text uri
+    verboseLink' uri = a ! href (fromString . T.unpack $ uri) $ text uri
     path' = T.unpack path
     entityLinks = do
       mapM_
@@ -115,7 +115,7 @@ entityDetails language path x =
 
     slot1 = do
       (h3 ! class_ "text-align-center font-size-xxx-large font-weight-500") . fromString . T.unpack $ (x ^. #displayName)
-      H.div ! class_ "flex direction-column justify-content-center gap-small align-items-center" $ do
+      H.div $ do
         likesDislikes path' language x
         entityButtons path' language x
 
@@ -128,7 +128,7 @@ entityDetails language path x =
         entityLinks
 
 likesDislikes path' vv x = do
-  section ! class_ "flex direction-row justify-content-center gap-small align-items-baseline" $ do
+  section $ do
     postForm' (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) "" $ do
       button ! type_ "submit" $ do
         H.span "+"
@@ -149,7 +149,7 @@ entityBaseDetails vv x = do
   detailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (Relude.show $ x ^. #createdBy)
 
 entityButtons path' vv x = do
-  H.div ! class_ "flex direction-row justify-content-center gap-small align-items-baseline" $ do
+  H.div $ do
     a
       ! href (fromString ("/" <> path' <> "/edit/" <> show (x ^. #identifier)))
       $ button
@@ -159,7 +159,7 @@ entityButtons path' vv x = do
 
 warningBanner :: ViewVars -> Html
 warningBanner vv =
-  section ! class_ "warning-section text-align-center" $ do
+  section $ do
     small
       ! class_ "warning-text"
       $ text

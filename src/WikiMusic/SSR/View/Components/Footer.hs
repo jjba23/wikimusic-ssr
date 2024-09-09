@@ -11,7 +11,7 @@ import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 
 simpleFooter :: ViewVars -> Html
-simpleFooter vv = H.footer ! class_ "flex direction-column text-align-center gap-medium padding-large" $ do
+simpleFooter vv = H.footer $ do
   small . text $ ((^. #more % #copyright0) |##| (vv ^. #language))
   a
     ! class_ "accent-color"
@@ -23,7 +23,7 @@ simpleFooter vv = H.footer ! class_ "flex direction-column text-align-center gap
 
 bodyWithFooter :: ViewVars -> Html -> Html
 bodyWithFooter vv x = do
-  body $ do
+  body ! class_ "container mx-auto" $ do
     _ <- x
     hr
     simpleFooter vv

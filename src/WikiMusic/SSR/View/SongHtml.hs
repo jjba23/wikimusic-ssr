@@ -26,11 +26,11 @@ songListPage' limit offset env vv xs =
     searchForm "/songs/search" $ do
       searchInput "searchInput"
       submitButtonNoText
-    section ! class_ "flex direction-row justify-content-center gap-small align-items-baseline" $ do
+    section $ do
       H.a ! href "/songs/create" $ button $ H.small "+ new song"
       mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
-    section ! class_ "flex direction-row justify-content-center gap-small" $ mapM_ (simpleEntityCard vv "songs") sortedXs
-    section ! class_ "flex direction-row justify-content-center gap-medium" $ do
+    section $ mapM_ (simpleEntityCard vv "songs") sortedXs
+    section $ do
       maybePrevPaginationButton limit offset (length (xs ^. #songs))
       maybeNextPaginationButton limit offset (length (xs ^. #songs))
   where
@@ -80,7 +80,7 @@ songDetails vv x = do
 
 mkVersion :: ViewVars -> SongContent -> Html
 mkVersion vv v = H.article $ do
-  hr ! class_ "margin-top-medium"
+  hr
   h3 . text $ (v ^. #versionName) <> " " <> (v ^. #instrumentType)
 
   detailList $ do

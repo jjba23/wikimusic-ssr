@@ -80,7 +80,7 @@ requiredPasswordInput name' displayLabel = formInput name' (Just displayLabel) T
 
 optionalFileInput :: Text -> Text -> Html
 optionalFileInput name' displayLabel =
-  H.div ! class_ "flex direction-column gap-small" $ do
+  H.div $ do
     H.div $ H.label ! A.for name'' $ text displayLabel
     H.input
       ! class_ ""
@@ -91,7 +91,7 @@ optionalFileInput name' displayLabel =
     name'' = fromTextToAttributeValue name'
 
 formInput :: Text -> Maybe Text -> Bool -> AttributeValue -> Maybe Text -> Html
-formInput name' displayLabel isRequired type' content' = H.div ! class_ "flex direction-column gap-small" $ do
+formInput name' displayLabel isRequired type' content' = H.div $ do
   H.div $ do
     mapM_ ((H.label ! A.for name'') . text) displayLabel
     mapM_ (\_ -> mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)) displayLabel
@@ -100,7 +100,7 @@ formInput name' displayLabel isRequired type' content' = H.div ! class_ "flex di
     name'' = fromTextToAttributeValue name'
 
 formArea :: Text -> Maybe Text -> Bool -> Bool -> AttributeValue -> Maybe Text -> Html
-formArea name' displayLabel isRequired isMono type' content' = H.div ! class_ "flex direction-column gap-small white-space-break-spaces" $ do
+formArea name' displayLabel isRequired isMono type' content' = H.div $ do
   H.div $ do
     mapM_ ((H.label ! A.for name'') . text) displayLabel
     mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)
@@ -170,18 +170,18 @@ searchForm action' =
 entityArtworkForm :: ViewVars -> Text -> [Artwork] -> Html
 entityArtworkForm vv path xs = section $ do
   unless (null xs) (hr >> (H.h2 ! A.id "edit-artwork" $ "Edit artwork"))
-  H.div ! class_ "flex direction-row margin-top-large gap-tiny" $ do
+  H.div $ do
     let arts = sortBy (\x y -> compare (x ^. #orderValue) (y ^. #orderValue)) xs
     mapM_ (mkArtworkManager vv path) arts
 
 mkArtworkManager :: ViewVars -> Text -> Artwork -> Html
 mkArtworkManager vv path artwork = H.div $ do
   img
-    ! class_ "simple-image"
+    ! class_ "object-cover"
     ! customAttribute "loading" "lazy"
     ! src (fromTextToAttributeValue $ artwork ^. #contentUrl)
   mapM_ (H.span . text) (artwork ^. #contentCaption)
-  H.div ! A.class_ "flex direction-row justify-content-center gap-tiny" $ do
+  H.div $ do
     postForm ("/" <> path <> "/artworks/order/" <> uuidToText (artwork ^. #identifier)) $ do
       input ! type_ "hidden" ! name "orderValue" ! A.value (fromTextToAttributeValue plusOne)
       button ! class_ "small-button" ! type_ "submit" $ small . text $ plusOne

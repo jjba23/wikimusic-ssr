@@ -15,7 +15,7 @@ errorPage' :: (MonadIO m) => Env -> ViewVars -> Text -> m Html
 errorPage' env vv message' =
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ section $ do
     h3 . text $ messageCauses
-    H.pre ! class_ "font-size-small" $ text message
+    H.pre $ text message
   where
     messageCauses :: Text
     messageCauses = T.intercalate " - " causeStrings

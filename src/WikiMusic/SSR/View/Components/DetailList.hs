@@ -10,7 +10,7 @@ import Text.Blaze.Html5.Attributes as A
 
 detailListEntry :: Text -> Html -> Html
 detailListEntry key val =
-  H.div ! class_ "flex direction-row gap-small align-items-baseline" $ do
+  H.div $ do
     dt . strong . text $ key
     dd val
 

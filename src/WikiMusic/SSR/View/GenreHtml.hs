@@ -28,11 +28,11 @@ genreListPage' limit offset env vv xs =
       searchForm "/genres/search" $ do
         searchInput "searchInput"
         submitButtonNoText
-      section ! class_ "flex direction-row justify-content-center gap-small align-items-baseline" $ do
+      section $ do
         H.a ! href "/genres/create" $ button $ H.small "+ new genre"
         mkSortingForm vv (vv ^. #genreSorting) "/user-preferences/genre-sorting" "genre-sorting"
-      section ! class_ "flex direction-row justify-content-center gap-small" $ mapM_ (simpleEntityCard vv "genres") sortedXs
-      section ! class_ "flex direction-row justify-content-center gap-medium" $ do
+      section $ mapM_ (simpleEntityCard vv "genres") sortedXs
+      section $ do
         maybePrevPaginationButton limit offset (length (xs ^. #genres))
         maybeNextPaginationButton limit offset (length (xs ^. #genres))
   where

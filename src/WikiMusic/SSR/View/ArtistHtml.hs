@@ -29,11 +29,11 @@ artistListPage' limit offset env vv xs =
         searchInput "searchInput"
         submitButtonNoText
 
-      section ! class_ "flex direction-row justify-content-center gap-small align-items-baseline" $ do
+      section $ do
         H.a ! href "/artists/create" $ button $ H.small "+ new artist"
         mkSortingForm vv (vv ^. #artistSorting) "/user-preferences/artist-sorting" "artist-sorting"
-      section ! class_ "flex direction-row justify-content-center gap-small" $ mapM_ (simpleEntityCard vv "artists") sortedXs
-      section ! class_ "flex direction-row justify-content-center gap-medium" $ do
+      section $ mapM_ (simpleEntityCard vv "artists") sortedXs
+      section $ do
         maybePrevPaginationButton limit offset (length (xs ^. #artists))
         maybeNextPaginationButton limit offset (length (xs ^. #artists))
   where
