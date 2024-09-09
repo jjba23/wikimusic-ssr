@@ -15,4 +15,4 @@ detailListEntry key val =
     dd val
 
 detailList :: Html -> Html
-detailList = dl ! class_ "flex flex-wrap flex-col gap-2"
+detailList = dl ! class_ "flex flex-wrap flex-row gap-2"

@@ -1,7 +1,7 @@
 cabal-version: 1.12
 
 name:           wikimusic-ssr
-version:        1.0.0.4
+version:        1.0.0.5
 description:    Please see the README at <https://github.com/jjba23/wikimusic-ssr>
 homepage:       https://github.com/jjba23/wikimusic-ssr
 bug-reports:    https://github.com/jjba23/wikimusic-ssr/-/issues
@@ -50,6 +50,7 @@ library
       WikiMusic.SSR.View.Components.Icons
       WikiMusic.SSR.View.Components.Footer
       WikiMusic.SSR.View.Components.DetailList
+      WikiMusic.SSR.View.Classes.Classes      
       WikiMusic.SSR.Backend.Rest
       WikiMusic.SSR.Language
       WikiMusic.SSR.Servant.ApiSetup

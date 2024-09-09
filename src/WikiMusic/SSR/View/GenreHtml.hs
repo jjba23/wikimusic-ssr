@@ -10,13 +10,10 @@ module WikiMusic.SSR.View.GenreHtml
   )
 where
 
-import Data.Map qualified as Map
-import Data.Text qualified as T
 import Principium
 import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import WikiMusic.Interaction.Model.Genre
-import WikiMusic.Model.Other
 import WikiMusic.SSR.View.Components.Forms
 import WikiMusic.SSR.View.Components.Other
 import WikiMusic.SSR.View.HtmlUtil
@@ -31,7 +28,7 @@ genreListPage' limit offset env vv xs =
       section $ do
         H.a ! href "/genres/create" $ button $ H.small "+ new genre"
         mkSortingForm vv (vv ^. #genreSorting) "/user-preferences/genre-sorting" "genre-sorting"
-      section $ mapM_ (simpleEntityCard vv "genres") sortedXs
+      section ! class_ "flex flex-col flex-wrap gap-4" $ mapM_ (simpleEntityCard vv "genres") sortedXs
       section $ do
         maybePrevPaginationButton limit offset (length (xs ^. #genres))
         maybeNextPaginationButton limit offset (length (xs ^. #genres))
@@ -63,7 +60,7 @@ genreEditPage' :: (MonadIO m) => Env -> ViewVars -> Genre -> m Html
 genreEditPage' env vv genre =
   simplePage env vv (SimplePageTitle "Edit genre") $ do
     section $ do
-      postForm ("/genres/edit/" <> (T.pack . show $ genre ^. #identifier)) $ do
+      postForm ("/genres/edit/" <> (packText . show $ genre ^. #identifier)) $ do
         requiredTextInput' "displayName" "genre name" (Just $ genre ^. #displayName)
         optionalTextArea' "description" "description" (genre ^. #description)
         optionalTextInput' "spotifyUrl" "spotify URL" (genre ^. #spotifyUrl)
@@ -72,6 +69,6 @@ genreEditPage' env vv genre =
         optionalTextInput' "soundcloudUrl" "soundcloud URL" (genre ^. #soundcloudUrl)
 
         submitButton vv
-    entityArtworkForm vv "genres" (map (^. #artwork) . Map.elems $ genre ^. #artworks)
+    entityArtworkForm vv "genres" (map (^. #artwork) . mapElems $ genre ^. #artworks)
     hr
     entityNewArtworkForm vv "genres" (genre ^. #identifier)

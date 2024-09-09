@@ -15,7 +15,7 @@ mkSortingForm vv sortOrder action' fieldName = section
   ! method "POST"
   ! enctype "multipart/form-data"
   $ do
-    select ! onchange "this.form.submit()" ! name (fromTextToAttributeValue fieldName) $ mapM_ mkOption entries
+    select ! class_ (fromTextToAttributeValue selectClass) ! onchange "this.form.submit()" ! name (fromTextToAttributeValue fieldName) $ mapM_ mkOption entries
     noscript $ button ! type_ "submit" $ "submit"
   where
     mkOption :: (Text, Text) -> Html
@@ -116,23 +116,23 @@ formArea name' displayLabel isRequired isMono type' content' = H.div $ do
 
 deleteButton :: ViewVars -> Html
 deleteButton vv =
-  button ! A.class_ "rounded-xl px-8 py-4 background-error border-error align-self-flex-end" ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
+  button ! class_ (fromTextToAttributeValue someButtonClass) ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
 
 submitButton :: ViewVars -> Html
 submitButton vv =
-  button ! A.class_ "rounded-xl px-8 py-4 background-success border-success align-self-flex-end" ! type_ "submit" $ do
+  button ! A.class_ (fromTextToAttributeValue submitButtonClass) ! type_ "submit" $ do
     H.span "✓"
     text $ (^. #forms % #submit) |##| (vv ^. #language)
 
 submitButton' :: ViewVars -> Html
 submitButton' vv =
-  button ! A.class_ "rounded-xl px-8 py-4 background-success border-success" ! type_ "submit" $ do
+  button ! A.class_ (fromTextToAttributeValue submitButtonClass) ! type_ "submit" $ do
     H.span "✓"
     text $ (^. #forms % #submit) |##| (vv ^. #language)
 
 submitButtonNoText :: Html
 submitButtonNoText =
-  button ! A.class_ "rounded-xl px-8 py-4 background-accent border-accent button-for-input" ! type_ "submit" $ H.span $ H.small ! A.class_ "font-sans font-weight-300" $ "search"
+  button ! A.class_ (fromTextToAttributeValue submitButtonClass) ! type_ "submit" $ H.span $ "search"
 
 dangerPostForm :: ViewVars -> Text -> Html -> Html
 dangerPostForm vv action' =
@@ -202,7 +202,7 @@ mkArtworkManager vv path artwork = H.div $ do
           <> uuidToText (artwork ^. #identifier)
       )
     $ button
-    ! class_ submitButtonClass
+    ! class_ (fromTextToAttributeValue submitButtonClass)
     ! type_ "submit"
     $ small
     $ simpleIcon "❌" "delete"

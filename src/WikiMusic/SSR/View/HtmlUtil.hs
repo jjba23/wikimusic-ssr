@@ -57,7 +57,7 @@ simplePage env vv title' body' = do
     sharedHead
     bodyWithFooter vv $ do
       sharedPageTop Nothing vv
-      H.h2 . text $ title' ^. #value
+      (H.h2 ! class_ "text-xl text-slate-600 font-sans font-bold") . text $ title' ^. #value
       body'
 
 maybeNextPaginationButton :: Limit -> Offset -> Int -> Html
@@ -66,6 +66,7 @@ maybeNextPaginationButton (Limit 0) _ _ = pure ()
 maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
   when (itemSize == limit)
     $ H.button
+    ! class_ (fromTextToAttributeValue someButtonClass)
     ! onclick (fromTextToAttributeValue func)
     $ "("
     <> pageNum
@@ -91,6 +92,7 @@ maybePrevPaginationButton (Limit 0) _ _ = pure ()
 maybePrevPaginationButton (Limit limit) (Offset offset) _ =
   when (offset > 0)
     $ H.button
+    ! class_ (fromTextToAttributeValue someButtonClass)
     ! onclick (fromTextToAttributeValue func)
     $ "< previous page ("
     <> pageNum
@@ -103,4 +105,6 @@ maybePrevPaginationButton (Limit limit) (Offset offset) _ =
       replaceText
         "\n"
         ""
-        [trimming|(function(){window.location = window.location.toString().replace("offset=$offset'", "offset=$newOffset")})()|]
+        [trimming|(function(){
+                 window.location = window.location.toString().replace("offset=$offset'", "offset=$newOffset")
+                 })()|]

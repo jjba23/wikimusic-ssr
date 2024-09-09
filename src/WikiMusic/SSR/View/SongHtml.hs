@@ -29,7 +29,7 @@ songListPage' limit offset env vv xs =
     section $ do
       H.a ! href "/songs/create" $ button $ H.small "+ new song"
       mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
-    section $ mapM_ (simpleEntityCard vv "songs") sortedXs
+    section ! class_ "flex flex-col flex-wrap gap-4" $ mapM_ (simpleEntityCard vv "songs") sortedXs
     section $ do
       maybePrevPaginationButton limit offset (length (xs ^. #songs))
       maybeNextPaginationButton limit offset (length (xs ^. #songs))
@@ -45,7 +45,7 @@ songDetailPage' env vv x = do
     entityDetails vv "songs" x
     songDetails vv x
     H.div $ H.form ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
-      select ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
+      select ! class_ (fromTextToAttributeValue selectClass) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
           ( \size' ->
               let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (fromTextToAttributeValue size')

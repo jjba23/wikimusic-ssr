@@ -11,6 +11,7 @@ module Principium
     module Free.AlaCarte,
     module WikiMusic.SSR.Model.Config,
     module Data.Time,
+    module WikiMusic.SSR.View.Classes.Classes,
     UUID.UUID,
     --
     maybeDecodeUtf8,
@@ -28,6 +29,7 @@ module Principium
     mapFromList,
     emptyMap,
     (Map.!?),
+    mapFilter,
   )
 where
 
@@ -52,6 +54,7 @@ import WikiMusic.SSR.Language
 import WikiMusic.SSR.Model.Api
 import WikiMusic.SSR.Model.Config
 import WikiMusic.SSR.Model.Env
+import WikiMusic.SSR.View.Classes.Classes
 
 --
 
@@ -89,3 +92,6 @@ mapFromList = Map.fromList
 
 emptyMap :: Map k a
 emptyMap = Map.empty
+
+mapFilter :: (a -> Bool) -> Map k a -> Map k a
+mapFilter = Map.filter
