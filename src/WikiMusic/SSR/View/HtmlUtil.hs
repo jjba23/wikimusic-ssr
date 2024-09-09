@@ -74,9 +74,8 @@ maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
 
 maybePrevPaginationButton :: Limit -> Offset -> Int -> Html
 maybePrevPaginationButton (Limit 0) _ _ = pure ()
-maybePrevPaginationButton _ (Offset 0) _ = pure ()
-maybePrevPaginationButton (Limit limit) (Offset offset) itemSize =
-  when (itemSize == limit)
+maybePrevPaginationButton (Limit limit) (Offset offset) _ =
+  when (offset > 0)
     $ (H.button ! onclick (fromTextToAttributeValue func))
     . H.small
     $ "< prev"
