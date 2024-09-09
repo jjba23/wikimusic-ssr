@@ -38,28 +38,30 @@ myNav vv = do
 
 userPrefs :: ViewVars -> Html
 userPrefs vv = do
-  H.div $ do
+  H.div ! class_ "flex flex-wrap flex-row gap-6 justify-center" $ do
     H.div
       $ H.form
       ! action "/user-preferences/locale"
       ! method "POST"
       ! enctype "multipart/form-data"
       $ do
-        select ! onchange "this.form.submit()" ! name "locale" $ do
+        select ! class_ selectStyle ! onchange "this.form.submit()" ! name "locale" $ do
           option H.!? ((vv ^. #language % #value) == "en", selected "true") ! value "en" $ "🇬🇧 English"
           option H.!? ((vv ^. #language % #value) == "nl", selected "true") ! value "nl" $ "🇳🇱 Nederlands"
 
         noscript $ button ! type_ "submit" $ "submit"
     H.div $ H.form ! action "/user-preferences/dark-mode" ! method "POST" ! enctype "multipart/form-data" $ do
-      select ! onchange "this.form.submit()" ! type_ "checkbox" ! name "dark-mode" ! A.id "dark-mode" $ do
+      select ! class_ selectStyle ! onchange "this.form.submit()" ! type_ "checkbox" ! name "dark-mode" ! A.id "dark-mode" $ do
         option H.!? ((vv ^. #uiMode % #value) == "dark", selected "true") ! value "dark" $ simpleIcon "🌙" "dark mode"
         option H.!? ((vv ^. #uiMode % #value) == "light", selected "true") ! value "light" $ simpleIcon "☀️" "light mode"
       noscript $ button ! type_ "submit" $ "submit"
     H.div $ H.form ! action "/user-preferences/palette" ! method "POST" ! enctype "multipart/form-data" $ do
-      select ! onchange "this.form.submit()" ! type_ "checkbox" ! name "palette" ! A.id "palette" $ do
+      select ! class_ selectStyle ! onchange "this.form.submit()" ! type_ "checkbox" ! name "palette" ! A.id "palette" $ do
         option H.!? ((vv ^. #palette % #value) == "mauve", selected "true") ! value "mauve" $ "mauve"
         option H.!? ((vv ^. #palette % #value) == "green", selected "true") ! value "green" $ "green"
       noscript $ button ! type_ "submit" $ "submit"
+  where
+    selectStyle = "rounded-lg px-10 py-6 font-sans w-fit"
 
 topTitle :: ViewVars -> Html
 topTitle vv = do

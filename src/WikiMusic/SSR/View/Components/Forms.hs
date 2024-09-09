@@ -83,7 +83,7 @@ optionalFileInput name' displayLabel =
   H.div $ do
     H.div $ H.label ! A.for name'' $ text displayLabel
     H.input
-      ! class_ ""
+      ! class_ "rounded-xl px-10 py-6 font-sans"
       ! A.name name''
       ! A.id name''
       ! type_ "file"
@@ -95,7 +95,7 @@ formInput name' displayLabel isRequired type' content' = H.div $ do
   H.div $ do
     mapM_ ((H.label ! A.for name'') . text) displayLabel
     mapM_ (\_ -> mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)) displayLabel
-  H.input ! class_ "" H.!? (isRequired, required "") ! A.name name'' ! A.id name'' ! type_ type' ! A.value (fromTextToAttributeValue $ fromMaybe "" content')
+  H.input ! class_ "rounded-xl px-8 py-4 font-sans" H.!? (isRequired, required "") ! A.name name'' ! A.id name'' ! type_ type' ! A.value (fromTextToAttributeValue $ fromMaybe "" content')
   where
     name'' = fromTextToAttributeValue name'
 
@@ -105,7 +105,7 @@ formArea name' displayLabel isRequired isMono type' content' = H.div $ do
     mapM_ ((H.label ! A.for name'') . text) displayLabel
     mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)
   H.textarea
-    ! class_ (if isMono then "font-mono big-mono-text-area font-size-small" else "font-sans")
+    ! class_ (if isMono then "rounded-xl px-8 py-4 font-mono text-base" else "rounded-xl px-8 py-4 font-sans")
     H.!? (isRequired, required "")
     ! A.name name''
     ! A.id name''
@@ -116,23 +116,23 @@ formArea name' displayLabel isRequired isMono type' content' = H.div $ do
 
 deleteButton :: ViewVars -> Html
 deleteButton vv =
-  button ! A.class_ "background-error border-error align-self-flex-end" ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
+  button ! A.class_ "rounded-xl px-8 py-4 background-error border-error align-self-flex-end" ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
 
 submitButton :: ViewVars -> Html
 submitButton vv =
-  button ! A.class_ "background-success border-success align-self-flex-end" ! type_ "submit" $ do
+  button ! A.class_ "rounded-xl px-8 py-4 background-success border-success align-self-flex-end" ! type_ "submit" $ do
     H.span "✓"
     text $ (^. #forms % #submit) |##| (vv ^. #language)
 
 submitButton' :: ViewVars -> Html
 submitButton' vv =
-  button ! A.class_ "background-success border-success" ! type_ "submit" $ do
+  button ! A.class_ "rounded-xl px-8 py-4 background-success border-success" ! type_ "submit" $ do
     H.span "✓"
     text $ (^. #forms % #submit) |##| (vv ^. #language)
 
 submitButtonNoText :: Html
 submitButtonNoText =
-  button ! A.class_ "background-accent border-accent button-for-input" ! type_ "submit" $ H.span $ H.small ! A.class_ "font-sans font-weight-300" $ "search"
+  button ! A.class_ "rounded-xl px-8 py-4 background-accent border-accent button-for-input" ! type_ "submit" $ H.span $ H.small ! A.class_ "font-sans font-weight-300" $ "search"
 
 dangerPostForm :: ViewVars -> Text -> Html -> Html
 dangerPostForm vv action' =
@@ -202,7 +202,7 @@ mkArtworkManager vv path artwork = H.div $ do
           <> uuidToText (artwork ^. #identifier)
       )
     $ button
-    ! class_ "small-button"
+    ! class_ submitButtonClass
     ! type_ "submit"
     $ small
     $ simpleIcon "❌" "delete"
