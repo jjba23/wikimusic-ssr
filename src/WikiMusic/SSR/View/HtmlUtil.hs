@@ -66,8 +66,8 @@ maybeNextPaginationButton (Limit 0) _ _ = pure ()
 maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
   when (itemSize == limit)
     $ H.button
-    ! class_ (fromTextToAttributeValue someButtonClass)
-    ! onclick (fromTextToAttributeValue func)
+    ! class_ (textToAttrValue someButtonClass)
+    ! onclick (textToAttrValue func)
     $ "("
     <> pageNum
     <> ") next page >"
@@ -92,8 +92,8 @@ maybePrevPaginationButton (Limit 0) _ _ = pure ()
 maybePrevPaginationButton (Limit limit) (Offset offset) _ =
   when (offset > 0)
     $ H.button
-    ! class_ (fromTextToAttributeValue someButtonClass)
-    ! onclick (fromTextToAttributeValue func)
+    ! class_ (textToAttrValue someButtonClass)
+    ! onclick (textToAttrValue func)
     $ "< previous page ("
     <> pageNum
     <> ")"

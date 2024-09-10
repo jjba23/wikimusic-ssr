@@ -11,12 +11,12 @@ module Principium
     module Free.AlaCarte,
     module WikiMusic.SSR.Model.Config,
     module Data.Time,
-    module WikiMusic.SSR.View.Classes.Classes,
+    module WikiMusic.SSR.View.CSS,
     UUID.UUID,
     --
     maybeDecodeUtf8,
     BL.ByteString,
-    fromTextToAttributeValue,
+    textToAttrValue,
     maybeDecodeBase16,
     uuidToText,
     intToText,
@@ -54,14 +54,14 @@ import WikiMusic.SSR.Language
 import WikiMusic.SSR.Model.Api
 import WikiMusic.SSR.Model.Config
 import WikiMusic.SSR.Model.Env
-import WikiMusic.SSR.View.Classes.Classes
+import WikiMusic.SSR.View.CSS
 
 --
 
 maybeDecodeUtf8 = decodeUtf8'
 
-fromTextToAttributeValue :: Text -> BlazeHtml.AttributeValue
-fromTextToAttributeValue = fromString . T.unpack
+textToAttrValue :: Text -> BlazeHtml.AttributeValue
+textToAttrValue = fromString . T.unpack
 
 maybeDecodeBase16 :: Text -> Either String BL.ByteString
 maybeDecodeBase16 = B16.decode . fromString . T.unpack

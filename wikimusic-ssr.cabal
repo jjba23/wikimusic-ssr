@@ -50,7 +50,7 @@ library
       WikiMusic.SSR.View.Components.Icons
       WikiMusic.SSR.View.Components.Footer
       WikiMusic.SSR.View.Components.DetailList
-      WikiMusic.SSR.View.Classes.Classes      
+      WikiMusic.SSR.View.CSS
       WikiMusic.SSR.Backend.Rest
       WikiMusic.SSR.Language
       WikiMusic.SSR.Servant.ApiSetup

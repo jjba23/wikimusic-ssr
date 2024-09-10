@@ -29,7 +29,7 @@ songListPage' limit offset env vv xs =
     section $ do
       H.a ! href "/songs/create" $ button $ H.small "+ new song"
       mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
-    section ! class_ (fromTextToAttributeValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "songs") sortedXs
+    section ! class_ (textToAttrValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "songs") sortedXs
     section $ do
       maybePrevPaginationButton limit offset (length (xs ^. #songs))
       maybeNextPaginationButton limit offset (length (xs ^. #songs))
@@ -45,10 +45,10 @@ songDetailPage' env vv x = do
     entityDetails vv "songs" x
     songDetails vv x
     H.div $ H.form ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
-      select ! class_ (fromTextToAttributeValue selectClass) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
+      select ! class_ (textToAttrValue selectClass) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
           ( \size' ->
-              let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (fromTextToAttributeValue size')
+              let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (textToAttrValue size')
                in mkOption . text $ size'
           )
           fontSizes
@@ -93,13 +93,13 @@ mkVersion vv v = H.article $ do
   mapM_
     ( \asciiLegend -> details ! open "" $ do
         H.summary "ASCII Legend"
-        (H.pre ! class_ (fromTextToAttributeValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
+        (H.pre ! class_ (textToAttrValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
     )
     (v ^. #asciiLegend)
   mapM_
     ( \asciiContents -> details ! open "" $ do
         H.summary "ASCII Content"
-        (H.pre ! class_ (fromTextToAttributeValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
+        (H.pre ! class_ (textToAttrValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
     )
     (v ^. #asciiContents)
   mapM_
@@ -111,7 +111,7 @@ mkVersion vv v = H.article $ do
             ! customAttribute "allowed" ""
             ! customAttribute "allowfullscreen" ""
             ! customAttribute "referrerpolicy" "noreferrer"
-            ! A.src (fromTextToAttributeValue pdfContents)
+            ! A.src (textToAttrValue pdfContents)
             $ ""
     )
     (v ^. #pdfContents)

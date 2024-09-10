@@ -32,7 +32,7 @@ artistListPage' limit offset env vv xs =
       section $ do
         H.a ! href "/artists/create" $ button $ H.small "+ new artist"
         mkSortingForm vv (vv ^. #artistSorting) "/user-preferences/artist-sorting" "artist-sorting"
-      section ! class_ (fromTextToAttributeValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "artists") sortedXs
+      section ! class_ (textToAttrValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "artists") sortedXs
       section $ do
         maybePrevPaginationButton limit offset (length (xs ^. #artists))
         maybeNextPaginationButton limit offset (length (xs ^. #artists))

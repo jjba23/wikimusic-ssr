@@ -123,11 +123,11 @@ entityDetails language path x =
 likesDislikes path' vv x = do
   section $ do
     postForm' (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) "" $ do
-      button ! class_ (fromTextToAttributeValue someButtonClass) ! type_ "submit" $ do
+      button ! class_ (textToAttrValue someButtonClass) ! type_ "submit" $ do
         H.span "+"
         text ((^. #buttons % #like) |##| (vv ^. #language))
     postForm' (fromString ("/" <> path' <> "/dislike/" <> show (x ^. #identifier))) "" $ do
-      button ! class_ (fromTextToAttributeValue someButtonClass) ! type_ "submit" $ do
+      button ! class_ (textToAttrValue someButtonClass) ! type_ "submit" $ do
         H.span "-"
         text ((^. #buttons % #dislike) |##| (vv ^. #language))
 
@@ -146,7 +146,7 @@ entityButtons path' vv x = do
     a
       ! href (fromString ("/" <> path' <> "/edit/" <> show (x ^. #identifier)))
       $ button
-      ! class_ (fromTextToAttributeValue someButtonClass)
+      ! class_ (textToAttrValue someButtonClass)
       $ text ((^. #buttons % #edit) |##| (vv ^. #language))
     dangerPostForm vv (fromString ("/" <> path' <> "/delete/" <> show (x ^. #identifier))) $ do
       deleteButton vv
