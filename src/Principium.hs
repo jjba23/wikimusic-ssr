@@ -11,7 +11,7 @@ module Principium
     module Free.AlaCarte,
     module WikiMusic.SSR.Model.Config,
     module Data.Time,
-    module WikiMusic.SSR.View.CSS,
+    module WikiMusic.SSR.View.Css,
     UUID.UUID,
     --
     maybeDecodeUtf8,
@@ -53,8 +53,8 @@ import WikiMusic.Model.Other
 import WikiMusic.SSR.Language
 import WikiMusic.SSR.Model.Api
 import WikiMusic.SSR.Model.Config
-import WikiMusic.SSR.Model.Envr
-import WikiMusic.SSR.View.CSS
+import WikiMusic.SSR.Model.Env
+import WikiMusic.SSR.View.Css
 
 --
 

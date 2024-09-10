@@ -22,9 +22,8 @@ import WikiMusic.SSR.View.HtmlUtil
 
 artistListPage' :: (MonadIO m) => Limit -> Offset -> Env -> ViewVars -> GetArtistsQueryResponse -> m Html
 artistListPage' limit offset env vv xs =
-  simplePage env vv (SimplePageTitle $ (^. #titles % #artistsPage) |##| (vv ^. #language))
-    $ section
-    $ do
+  simplePage env vv (SimplePageTitle $ (^. #titles % #artistsPage) |##| (vv ^. #language)) $ do
+    section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center"] $ do
       searchForm "/artists/search" $ do
         searchInput "searchInput"
         submitButtonNoText
@@ -32,10 +31,10 @@ artistListPage' limit offset env vv xs =
       section $ do
         H.a ! href "/artists/create" $ button $ H.small "+ new artist"
         mkSortingForm vv (vv ^. #artistSorting) "/user-preferences/artist-sorting" "artist-sorting"
-      section ! class_ (textToAttrValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "artists") sortedXs
-      section $ do
-        maybePrevPaginationButton limit offset (length (xs ^. #artists))
-        maybeNextPaginationButton limit offset (length (xs ^. #artists))
+    section ! css cssCenteredCardGrid $ mapM_ (simpleEntityCard vv "artists") sortedXs
+    section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center", "my-6"] $ do
+      maybePrevPaginationButton limit offset (length (xs ^. #artists))
+      maybeNextPaginationButton limit offset (length (xs ^. #artists))
   where
     sortedXs =
       mapMaybe

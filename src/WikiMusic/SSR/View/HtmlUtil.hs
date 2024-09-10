@@ -57,8 +57,20 @@ simplePage env vv title' body' = do
     sharedHead
     bodyWithFooter vv $ do
       sharedPageTop Nothing vv
-      (H.h2 ! class_ "text-xl text-slate-600 font-sans font-bold") . text $ title' ^. #value
+      (H.h2 ! css' ["text-xl", "text-slate-600", "font-sans", "font-bold"]) . text $ title' ^. #value
       body'
+
+paginationOffsetJS :: Text -> Text -> Text
+paginationOffsetJS offset' newOffset =
+  [trimming|(function(){
+                 if(/offset/.test(window.location.toString())){
+                     window.location = window.location.toString()
+                       .replace("offset=$offset'", "offset=$newOffset");
+                   }else{
+                     window.location = window.location + "?offset=$newOffset";
+                   }
+                 })
+                 ()|]
 
 maybeNextPaginationButton :: Limit -> Offset -> Int -> Html
 maybeNextPaginationButton _ _ 0 = pure ()
@@ -66,8 +78,8 @@ maybeNextPaginationButton (Limit 0) _ _ = pure ()
 maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
   when (itemSize == limit)
     $ H.button
-    ! class_ (textToAttrValue someButtonClass)
-    ! onclick (textToAttrValue func)
+    ! css cssButton
+    ! onclick (textToAttrValue . minify $ paginationOffsetJS offset' newOffset)
     $ "("
     <> pageNum
     <> ") next page >"
@@ -75,25 +87,18 @@ maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
     offset' = show offset
     newOffset = show $ offset + limit
     pageNum = show $ (offset `div` limit) + 1
-    func =
+    minify =
       replaceText
         "\n"
         ""
-        [trimming|(function(){
-                 if(/offset/.test(window.location.toString())){
-                   window.location = window.location.toString().replace("offset=$offset'", "offset=$newOffset");
-                   }else{
-                   window.location = window.location + "?offset=$newOffset";
-                   }
-                 })()|]
 
 maybePrevPaginationButton :: Limit -> Offset -> Int -> Html
 maybePrevPaginationButton (Limit 0) _ _ = pure ()
 maybePrevPaginationButton (Limit limit) (Offset offset) _ =
   when (offset > 0)
     $ H.button
-    ! class_ (textToAttrValue someButtonClass)
-    ! onclick (textToAttrValue func)
+    ! css cssButton
+    ! onclick (textToAttrValue . minify $ paginationOffsetJS offset' newOffset)
     $ "< previous page ("
     <> pageNum
     <> ")"
@@ -101,10 +106,7 @@ maybePrevPaginationButton (Limit limit) (Offset offset) _ =
     offset' = show offset
     newOffset = show $ offset - limit
     pageNum = show $ (offset `div` limit) - 1
-    func =
+    minify =
       replaceText
         "\n"
         ""
-        [trimming|(function(){
-                 window.location = window.location.toString().replace("offset=$offset'", "offset=$newOffset")
-                 })()|]

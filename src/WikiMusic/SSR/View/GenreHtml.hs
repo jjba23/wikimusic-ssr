@@ -21,17 +21,18 @@ import WikiMusic.SSR.View.HtmlUtil
 genreListPage' :: (MonadIO m) => Limit -> Offset -> Env -> ViewVars -> GetGenresQueryResponse -> m Html
 genreListPage' limit offset env vv xs =
   simplePage env vv (SimplePageTitle $ (^. #titles % #genresPage) |##| (vv ^. #language)) $ do
-    section $ do
+    section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center"] $ do
       searchForm "/genres/search" $ do
         searchInput "searchInput"
         submitButtonNoText
       section $ do
         H.a ! href "/genres/create" $ button $ H.small "+ new genre"
         mkSortingForm vv (vv ^. #genreSorting) "/user-preferences/genre-sorting" "genre-sorting"
-      section ! class_ (textToAttrValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "genres") sortedXs
-      section $ do
-        maybePrevPaginationButton limit offset (length (xs ^. #genres))
-        maybeNextPaginationButton limit offset (length (xs ^. #genres))
+    --
+    section ! css cssCenteredCardGrid $ mapM_ (simpleEntityCard vv "genres") sortedXs
+    section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center", "my-6"] $ do
+      maybePrevPaginationButton limit offset (length (xs ^. #genres))
+      maybeNextPaginationButton limit offset (length (xs ^. #genres))
   where
     sortedXs =
       mapMaybe

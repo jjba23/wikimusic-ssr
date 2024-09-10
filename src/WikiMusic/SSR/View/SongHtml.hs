@@ -23,14 +23,16 @@ import WikiMusic.SSR.View.HtmlUtil
 songListPage' :: (MonadIO m) => Limit -> Offset -> Env -> ViewVars -> GetSongsQueryResponse -> m Html
 songListPage' limit offset env vv xs =
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ do
-    searchForm "/songs/search" $ do
-      searchInput "searchInput"
-      submitButtonNoText
-    section $ do
-      H.a ! href "/songs/create" $ button $ H.small "+ new song"
-      mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
-    section ! class_ (textToAttrValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "songs") sortedXs
-    section $ do
+    section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center"] $ do
+      searchForm "/songs/search" $ do
+        searchInput "searchInput"
+        submitButtonNoText
+      section $ do
+        H.a ! href "/songs/create" $ button $ H.small "+ new song"
+        mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
+    --
+    section ! css cssCenteredCardGrid $ mapM_ (simpleEntityCard vv "songs") sortedXs
+    section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center", "my-6"] $ do
       maybePrevPaginationButton limit offset (length (xs ^. #songs))
       maybeNextPaginationButton limit offset (length (xs ^. #songs))
   where
@@ -45,7 +47,7 @@ songDetailPage' env vv x = do
     entityDetails vv "songs" x
     songDetails vv x
     H.div $ H.form ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
-      select ! class_ (textToAttrValue selectClass) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
+      select ! css cssSelect ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
           ( \size' ->
               let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (textToAttrValue size')
@@ -61,9 +63,9 @@ songDetailPage' env vv x = do
 
 songDetails :: ViewVars -> Song -> Html
 songDetails vv x = do
-  section $ detailList Nothing $ do
+  section $ detailList $ do
     mapM_
-      (detailListEntry ((^. #more % #musicTuning) |##| (vv ^. #language)) . text)
+      (monoDetailListEntry ((^. #more % #musicTuning) |##| (vv ^. #language)) . text)
       (x ^. #musicTuning)
     mapM_
       (detailListEntry ((^. #more % #musicKey) |##| (vv ^. #language)) . text)
@@ -81,32 +83,33 @@ songDetails vv x = do
 mkVersion :: ViewVars -> SongContent -> Html
 mkVersion vv v = H.article $ do
   hr
-  h3 . text $ (v ^. #versionName) <> " " <> (v ^. #instrumentType)
+  (h3 ! css' ["text-xl", "font-bold"]) . text $ (v ^. #versionName) <> " " <> (v ^. #instrumentType)
 
-  detailList Nothing $ do
+  detailList $ do
     mapM_
       (detailListEntry ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
       (show <$> v ^. #lastEditedAt)
     detailListEntry ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ v ^. #createdAt)
-    detailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
+    monoDetailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
 
   mapM_
-    ( \asciiLegend -> details ! open "" $ do
-        H.summary "ASCII Legend"
+    ( \asciiLegend -> details ! css cssDetails ! open "" $ do
+        H.summary ! css cssSummary $ "ASCII Legend"
         (H.pre ! class_ (textToAttrValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
     )
     (v ^. #asciiLegend)
   mapM_
-    ( \asciiContents -> details ! open "" $ do
-        H.summary "ASCII Content"
+    ( \asciiContents -> details ! css cssDetails ! open "" $ do
+        H.summary ! css cssSummary $ "ASCII Content"
         (H.pre ! class_ (textToAttrValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
     )
     (v ^. #asciiContents)
   mapM_
-    ( \pdfContents -> details ! open "" $ do
+    ( \pdfContents -> details ! css cssDetails ! open "" $ do
         when (pdfContents /= "data:application/octet-stream;base64,") $ do
-          H.summary "PDF Content"
+          H.summary ! css cssSummary $ "PDF Content"
           H.iframe
+            ! css' ["w-full", "h-full", "block"]
             ! customAttribute "loading" "lazy"
             ! customAttribute "allowed" ""
             ! customAttribute "allowfullscreen" ""

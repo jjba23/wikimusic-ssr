@@ -37,16 +37,16 @@ dislikeCount entity =
 mkIdentifierHref :: Text -> UUID -> AttributeValue
 mkIdentifierHref path identifier = fromString ("/" <> unpackText path <> "/" <> show identifier)
 
-simpleEntityCard vv path entity = article ! class_ (["bg-slate-100", "rounded-2xl", "flex", "flex-wrap", "gap-4", "flex-row", "md:flex-col", "max-w-60", "border", "border-gray-300"] @@) $ do
+simpleEntityCard vv path entity = article ! css' ["bg-slate-100", "rounded-2xl", "flex", "flex-wrap", "gap-4", "flex-row", "md:flex-col", "max-w-56", "border", "border-gray-300"] $ do
   maybeImg
-  H.div ! class_ "px-6 py-6" $ do
+  H.div ! css' ["px-4", "py-4", "flex", "flex-col", "gap-4", "align-center"] $ do
     a
       ! href (mkIdentifierHref path (entity ^. #identifier))
-      $ (h3 ! class_ (["text-2xl", "font-bold", "break-words"] @@))
+      $ (h3 ! css' ["text-xl", "font-bold", "break-words", "text-center"])
       . text
       $ entity
       ^. #displayName
-    detailList (Just . Class $ "gap-4") $ do
+    detailList $ do
       detailListEntry ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount entity)
       detailListEntry ((^. #more % #dislikes) |##| (vv ^. #language)) (text $ dislikeCount entity)
       detailListEntry ((^. #more % #views) |##| (vv ^. #language)) (text . packText . show $ entity ^. #viewCount)
@@ -58,7 +58,7 @@ simpleEntityCard vv path entity = article ! class_ (["bg-slate-100", "rounded-2x
       a
         ! href (mkIdentifierHref path (entity ^. #identifier))
         $ img
-        ! class_ (["object-cover", "w-60", "h-60", "rounded-2xl"] @@)
+        ! css' ["object-cover", "w-60", "h-60", "rounded-2xl"]
         ! customAttribute "loading" "lazy"
         ! src (fromString . unpackText $ x ^. #contentUrl)
 
@@ -69,7 +69,7 @@ imageCarousel artworks =
       ( \x ->
           H.div $ do
             img
-              ! class_ (["object-cover", "w-72", "h-72", "rounded-2xl"] @@)
+              ! css' ["object-cover", "w-72", "h-72", "rounded-2xl"]
               ! customAttribute "loading" "lazy"
               ! src (fromString . unpackText $ x ^. #contentUrl)
             mapM_ (H.span . text) (x ^. #contentCaption)
@@ -78,10 +78,10 @@ imageCarousel artworks =
 
 entityDetailsSkeleton :: Html -> Html -> Html
 entityDetailsSkeleton slot0 slot1 =
-  H.div ! class_ (["flex", "flex-row", "flex-wrap", "gap-lg"] @@) $ do
-    H.div ! class_ (["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] @@) $ do
+  H.div ! css' ["flex", "flex-row", "flex-wrap", "gap-lg"] $ do
+    H.div ! css' ["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] $ do
       slot0
-    H.div ! class_ (["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] @@) $ do
+    H.div ! css' ["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] $ do
       slot1
 
 entityDetails language path x =
@@ -106,30 +106,29 @@ entityDetails language path x =
       imageCarousel (map (^. #artwork) (mapElems $ x ^. #artworks))
       mapM_ ((p ! A.class_ "white-space-break-spaces") . text) (x ^. #description)
 
-    slot1 = section ! class_ (["flex", "flex-col", "flex-wrap", "items-center", "gap-8"] @@) $ do
-      (h3 ! class_ (["text-3xl", "text-black", "font-bold"] @@)) . fromString . unpackText $ (x ^. #displayName)
+    slot1 = section ! css' ["flex", "flex-col", "flex-wrap", "items-center", "gap-8"] $ do
+      (h3 ! css' ["text-3xl", "text-black", "font-bold"]) . fromString . unpackText $ (x ^. #displayName)
       H.div ! class_ "flex flex-row flex-wrap justify-center gap-md" $ do
         likesDislikes path' language x
         entityButtons path' language x
 
         section
           ! class_ "flex flex-row flex-wrap justify-center gap-md"
-          $ detailList Nothing
+          $ detailList
           $ do
             entityBaseDetails language x
         hr
         entityLinks
 
 likesDislikes path' vv x = do
-  section $ do
-    postForm' (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) "" $ do
-      button ! class_ (textToAttrValue someButtonClass) ! type_ "submit" $ do
-        H.span "+"
-        text ((^. #buttons % #like) |##| (vv ^. #language))
-    postForm' (fromString ("/" <> path' <> "/dislike/" <> show (x ^. #identifier))) "" $ do
-      button ! class_ (textToAttrValue someButtonClass) ! type_ "submit" $ do
-        H.span "-"
-        text ((^. #buttons % #dislike) |##| (vv ^. #language))
+  postForm' (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) "" $ do
+    button ! css cssButton ! type_ "submit" $ do
+      H.span "+"
+      text ((^. #buttons % #like) |##| (vv ^. #language))
+  postForm' (fromString ("/" <> path' <> "/dislike/" <> show (x ^. #identifier))) "" $ do
+    button ! css cssButton ! type_ "submit" $ do
+      H.span "-"
+      text ((^. #buttons % #dislike) |##| (vv ^. #language))
 
 entityBaseDetails vv x = do
   detailListEntry ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount x)
@@ -142,14 +141,13 @@ entityBaseDetails vv x = do
   detailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ x ^. #createdBy)
 
 entityButtons path' vv x = do
-  H.div $ do
-    a
-      ! href (fromString ("/" <> path' <> "/edit/" <> show (x ^. #identifier)))
-      $ button
-      ! class_ (textToAttrValue someButtonClass)
-      $ text ((^. #buttons % #edit) |##| (vv ^. #language))
-    dangerPostForm vv (fromString ("/" <> path' <> "/delete/" <> show (x ^. #identifier))) $ do
-      deleteButton vv
+  a
+    ! href (fromString ("/" <> path' <> "/edit/" <> show (x ^. #identifier)))
+    $ button
+    ! css cssButton
+    $ text ((^. #buttons % #edit) |##| (vv ^. #language))
+  dangerPostForm vv (fromString ("/" <> path' <> "/delete/" <> show (x ^. #identifier))) $ do
+    deleteButton vv
 
 warningBanner :: ViewVars -> Html
 warningBanner vv =

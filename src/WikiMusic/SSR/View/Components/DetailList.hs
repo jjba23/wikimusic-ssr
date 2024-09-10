@@ -1,22 +1,29 @@
 {-# LANGUAGE OverloadedLabels #-}
 
-module WikiMusic.SSR.View.Components.DetailList
-  ( detailList,
-    detailListEntry,
-  )
-where
+module WikiMusic.SSR.View.Components.DetailList where
 
 import Principium
 import Text.Blaze.Html5 as H
-import Text.Blaze.Html5.Attributes as A
+
+detailListEntry' :: Bool -> Text -> Html -> Html
+detailListEntry' isMono key val =
+  H.div
+    ! css'
+      [ "flex",
+        "flex-row",
+        "gap-4",
+        "w-fit",
+        "font-sans"
+      ]
+    $ do
+      (dt ! css' ["text-gray-600"]) . text $ key
+      dd ! css' ["text-gray-500", if isMono then "font-mono" else "font-sans"] $ val
 
 detailListEntry :: Text -> Html -> Html
-detailListEntry key val =
-  H.div $ do
-    dt . strong . text $ key
-    dd val
+detailListEntry = detailListEntry' False
 
-detailList :: Maybe Class -> Html -> Html
-detailList maybeGap = dl ! class_ (["flex", "flex-wrap", "flex-row", gapClass, "justify-center"])
-  where
-    gapClass = maybe "gap-8" (^. #value) maybeGap
+monoDetailListEntry :: Text -> Html -> Html
+monoDetailListEntry = detailListEntry' True
+
+detailList :: Html -> Html
+detailList = dl ! css' ["flex", "flex-wrap", "flex-row", "gap-2", "justify-center"]

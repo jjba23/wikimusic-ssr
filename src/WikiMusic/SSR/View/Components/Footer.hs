@@ -11,10 +11,10 @@ import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 
 simpleFooter :: ViewVars -> Html
-simpleFooter vv = H.footer $ do
-  small . text $ ((^. #more % #copyright0) |##| (vv ^. #language))
+simpleFooter vv = H.footer ! css' ["flex", "flex-col", "justify-center", "gap-6", "align-center", "text-center", "py-6"] $ do
+  (small ! css' ["italic"]) . text $ ((^. #more % #copyright0) |##| (vv ^. #language))
   a
-    ! class_ "accent-color"
+    ! css' ["accent-color"]
     ! href "https://github.com/jjba23/wikimusic-ssr"
     $ small
     . text
@@ -23,7 +23,7 @@ simpleFooter vv = H.footer $ do
 
 bodyWithFooter :: ViewVars -> Html -> Html
 bodyWithFooter vv x = do
-  body ! class_ "container mx-auto" $ do
+  body ! css' ["container", "mx-auto"] $ do
     _ <- x
     hr
     simpleFooter vv

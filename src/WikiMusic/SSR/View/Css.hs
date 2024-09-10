@@ -11,12 +11,12 @@ import Relude
 import Text.Blaze.Html qualified as BlazeHtml
 import Text.Blaze.Html5.Attributes qualified as A
 
-newtype CSS = CSS {className :: Text} deriving (Generic, Eq, Show)
+newtype Css = Css {className :: Text} deriving (Generic, Eq, Show)
 
-makeFieldLabelsNoPrefix ''CSS
+makeFieldLabelsNoPrefix ''Css
 
-classListToAttributeValue :: [Text] -> BlazeHtml.AttributeValue
-classListToAttributeValue = fromString . T.unpack . joinClasses . fromList
+cssToAttrValue :: [Text] -> BlazeHtml.AttributeValue
+cssToAttrValue = fromString . T.unpack . joinClasses . fromList
   where
     joinClasses :: Set Text -> Text
     joinClasses = T.intercalate " " . toList
@@ -25,19 +25,19 @@ css' :: [Text] -> BlazeHtml.Attribute
 css' xs = css (fromList xs :: Set Text)
 
 css :: Set Text -> BlazeHtml.Attribute
-css xs = A.class_ (classListToAttributeValue $ toList xs)
+css xs = A.class_ (cssToAttrValue $ toList xs)
 
-submitButtonClass :: Set Text
-submitButtonClass =
+cssSubmitButton :: Set Text
+cssSubmitButton =
   fromList
     [ "text-white",
-      "bg-green-700",
+      "bg-green-700/75",
       "hover:bg-green-800",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-green-300",
       "font-medium",
-      "rounded-full",
+      "rounded-2xl",
       "text-sm",
       "px-5",
       "py-2.5",
@@ -48,48 +48,69 @@ submitButtonClass =
       "w-fit"
     ]
 
-selectClass :: Set Text
-selectClass =
-  fromList
-    [ "block",
-      "w-fit",
-      "p-4",
-      "text-gray-900",
-      "border",
-      "border-gray-300",
-      "rounded-lg",
-      "bg-gray-100",
-      "text-base",
-      "focus:ring-blue-500",
-      "focus:border-blue-500",
-      "font-sans"
-    ]
-
-someButtonClass :: Set Text
-someButtonClass =
+cssSelect :: Set Text
+cssSelect =
   fromList
     [ "text-black",
-      "bg-gray-200",
-      "hover:bg-gray-300",
+      "bg-gray-100/75",
+      "hover:bg-accent-500",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-gray-300",
       "font-medium",
-      "rounded-full",
+      "rounded-2xl",
+      "text-lg",
+      "px-8",
+      "py-2",
+      "me-2",
+      "mb-2",
+      "font-sans",
+      "w-fit",
+      "h-fit",
+      "border"
+    ]
+
+cssButton :: Set Text
+cssButton =
+  fromList
+    [ "text-black",
+      "bg-gray-100/75",
+      "hover:bg-accent-500",
+      "focus:outline-none",
+      "focus:ring-4",
+      "focus:ring-gray-300",
+      "font-medium",
+      "rounded-2xl",
       "text-lg",
       "px-5",
       "py-2.5",
       "me-2",
       "mb-2",
       "font-sans",
-      "w-fit"
+      "w-fit",
+      "border"
     ]
 
-entityCardSectionClass :: Set Text
-entityCardSectionClass = fromList ["flex", "flex-row", "flex-wrap", "gap-4"]
+cssCenteredCardGrid :: Set Text
+cssCenteredCardGrid = fromList ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center"]
 
-inputClass :: Set Text
-inputClass = fromList ["rounded-xl", "px-5", "py-2.5", "font-sans"]
+cssInput :: Set Text
+cssInput = fromList ["rounded-2xl", "px-5", "py-2.5", "font-sans"]
 
-textareaClass :: Set Text
-textareaClass = fromList ["rounded-xl", "px-5", "py-2.5"]
+cssTextarea :: Set Text
+cssTextarea = fromList ["rounded-2xl", "px-5", "py-2.5"]
+
+cssDetails :: Set Text
+cssDetails =
+  fromList
+    [ "border-2",
+      "border",
+      "border-gray-200",
+      "p-4",
+      "[&_svg]:open:-rotate-180]",
+      "my-4",
+      "rounded-2xl"
+    ]
+
+cssSummary :: Set Text
+cssSummary = fromList ["text-xl", "font-bold", "cursor-pointer"]

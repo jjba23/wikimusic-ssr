@@ -15,7 +15,7 @@ mkSortingForm vv sortOrder action' fieldName = section
   ! method "POST"
   ! enctype "multipart/form-data"
   $ do
-    select ! class_ (textToAttrValue selectClass) ! onchange "this.form.submit()" ! name (textToAttrValue fieldName) $ mapM_ mkOption entries
+    select ! css cssSelect ! onchange "this.form.submit()" ! name (textToAttrValue fieldName) $ mapM_ mkOption entries
     noscript $ button ! type_ "submit" $ "submit"
   where
     mkOption :: (Text, Text) -> Html
@@ -83,7 +83,7 @@ optionalFileInput name' displayLabel =
   H.div $ do
     H.div $ H.label ! A.for name'' $ text displayLabel
     H.input
-      ! class_ "rounded-xl px-10 py-6 font-sans"
+      ! class_ "rounded-2xl px-10 py-6 font-sans"
       ! A.name name''
       ! A.id name''
       ! type_ "file"
@@ -94,8 +94,8 @@ formInput :: Text -> Maybe Text -> Bool -> AttributeValue -> Maybe Text -> Html
 formInput name' displayLabel isRequired type' content' = H.div $ do
   H.div $ do
     mapM_ ((H.label ! A.for name'') . text) displayLabel
-    mapM_ (\_ -> mapM_ (H.span ! d ["font-bold"]) (if isRequired then Just "*" else Nothing)) displayLabel
-  H.input ! class_ (inputClass @@@) H.!? (isRequired, required "") ! A.name name'' ! A.id name'' ! type_ type' ! A.value (textToAttrValue $ fromMaybe "" content')
+    mapM_ (\_ -> mapM_ (H.span ! css' ["font-bold"]) (if isRequired then Just "*" else Nothing)) displayLabel
+  H.input ! css cssInput H.!? (isRequired, required "") ! A.name name'' ! A.id name'' ! type_ type' ! A.value (textToAttrValue $ fromMaybe "" content')
   where
     name'' = textToAttrValue name'
 
@@ -105,7 +105,7 @@ formArea name' displayLabel isRequired isMono type' content' = H.div $ do
     mapM_ ((H.label ! A.for name'') . text) displayLabel
     mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)
   H.textarea
-    ! class_ (if isMono then "rounded-xl px-8 py-4 font-mono text-base" else "rounded-xl px-8 py-4 font-sans")
+    ! class_ (if isMono then "rounded-2xl px-8 py-4 font-mono text-base" else "rounded-2xl px-8 py-4 font-sans")
     H.!? (isRequired, required "")
     ! A.name name''
     ! A.id name''
@@ -116,23 +116,23 @@ formArea name' displayLabel isRequired isMono type' content' = H.div $ do
 
 deleteButton :: ViewVars -> Html
 deleteButton vv =
-  button ! class_ (textToAttrValue someButtonClass) ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
+  button ! css cssButton ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
 
 submitButton :: ViewVars -> Html
 submitButton vv =
-  button ! A.class_ (textToAttrValue submitButtonClass) ! type_ "submit" $ do
+  button ! css cssSubmitButton ! type_ "submit" $ do
     H.span "✓"
     text $ (^. #forms % #submit) |##| (vv ^. #language)
 
 submitButton' :: ViewVars -> Html
 submitButton' vv =
-  button ! A.class_ (textToAttrValue submitButtonClass) ! type_ "submit" $ do
+  button ! css cssSubmitButton ! type_ "submit" $ do
     H.span "✓"
     text $ (^. #forms % #submit) |##| (vv ^. #language)
 
 submitButtonNoText :: Html
 submitButtonNoText =
-  button ! A.class_ (textToAttrValue submitButtonClass) ! type_ "submit" $ H.span $ "search"
+  button ! css' ["transparent", "text-3xl", "px-4"] ! type_ "submit" $ H.span "🔍"
 
 dangerPostForm :: ViewVars -> Text -> Html -> Html
 dangerPostForm vv action' =
@@ -177,7 +177,7 @@ entityArtworkForm vv path xs = section $ do
 mkArtworkManager :: ViewVars -> Text -> Artwork -> Html
 mkArtworkManager vv path artwork = H.div $ do
   img
-    ! class_ "object-cover"
+    ! css' ["object-cover"]
     ! customAttribute "loading" "lazy"
     ! src (textToAttrValue $ artwork ^. #contentUrl)
   mapM_ (H.span . text) (artwork ^. #contentCaption)
@@ -193,7 +193,7 @@ mkArtworkManager vv path artwork = H.div $ do
           (textToAttrValue minusOne)
       button ! class_ "small-button" ! type_ "submit" $ small . text $ minusOne
   H.div
-    ! A.class_ "flex direction-row justify-content-center gap-tiny"
+    ! css' []
     $ dangerPostForm
       vv
       ( "/"
@@ -202,7 +202,7 @@ mkArtworkManager vv path artwork = H.div $ do
           <> uuidToText (artwork ^. #identifier)
       )
     $ button
-    ! class_ (textToAttrValue submitButtonClass)
+    ! css cssSubmitButton
     ! type_ "submit"
     $ small
     $ simpleIcon "❌" "delete"

@@ -61,7 +61,7 @@ inviteUserPage' env vv = do
       requiredEmailInput "email" "email"
       requiredTextInput "displayName" "name"
       H.label ! for "role" $ "role"
-      select ! class_ (textToAttrValue selectClass) ! required "" ! name "role" ! A.id "role" $ do
+      select ! css cssSelect ! required "" ! name "role" ! A.id "role" $ do
         option ! value "wm::demo" $ "demo user"
         option ! value "wm::lowrank" $ "average user"
         option ! value "wm::maintainer" $ "wiki maintainer"
