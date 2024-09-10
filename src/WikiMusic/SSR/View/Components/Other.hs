@@ -37,16 +37,16 @@ dislikeCount entity =
 mkIdentifierHref :: Text -> UUID -> AttributeValue
 mkIdentifierHref path identifier = fromString ("/" <> unpackText path <> "/" <> show identifier)
 
-simpleEntityCard vv path entity = article ! class_ "bg-slate-200 rounded-2xl flex flex-wrap flex-row gap-4" $ do
+simpleEntityCard vv path entity = article ! class_ (["bg-slate-100", "rounded-2xl", "flex", "flex-wrap", "gap-4", "flex-row", "md:flex-col", "max-w-60", "border", "border-gray-300"] @@) $ do
   maybeImg
   H.div ! class_ "px-6 py-6" $ do
     a
       ! href (mkIdentifierHref path (entity ^. #identifier))
-      $ (h3 ! class_ "text-2xl font-bold")
+      $ (h3 ! class_ (["text-2xl", "font-bold", "break-words"] @@))
       . text
       $ entity
       ^. #displayName
-    detailList $ do
+    detailList (Just . Class $ "gap-4") $ do
       detailListEntry ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount entity)
       detailListEntry ((^. #more % #dislikes) |##| (vv ^. #language)) (text $ dislikeCount entity)
       detailListEntry ((^. #more % #views) |##| (vv ^. #language)) (text . packText . show $ entity ^. #viewCount)
@@ -58,7 +58,7 @@ simpleEntityCard vv path entity = article ! class_ "bg-slate-200 rounded-2xl fle
       a
         ! href (mkIdentifierHref path (entity ^. #identifier))
         $ img
-        ! class_ "object-cover w-60 h-60 rounded-2xl"
+        ! class_ (["object-cover", "w-60", "h-60", "rounded-2xl"] @@)
         ! customAttribute "loading" "lazy"
         ! src (fromString . unpackText $ x ^. #contentUrl)
 
@@ -69,7 +69,7 @@ imageCarousel artworks =
       ( \x ->
           H.div $ do
             img
-              ! class_ "object-cover w-72 h-72 rounded-2xl"
+              ! class_ (["object-cover", "w-72", "h-72", "rounded-2xl"] @@)
               ! customAttribute "loading" "lazy"
               ! src (fromString . unpackText $ x ^. #contentUrl)
             mapM_ (H.span . text) (x ^. #contentCaption)
@@ -78,10 +78,10 @@ imageCarousel artworks =
 
 entityDetailsSkeleton :: Html -> Html -> Html
 entityDetailsSkeleton slot0 slot1 =
-  H.div ! class_ "flex flex-row flex-wrap gap-lg" $ do
-    H.div $ do
+  H.div ! class_ (["flex", "flex-row", "flex-wrap", "gap-lg"] @@) $ do
+    H.div ! class_ (["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] @@) $ do
       slot0
-    H.div $ do
+    H.div ! class_ (["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] @@) $ do
       slot1
 
 entityDetails language path x =
@@ -106,15 +106,15 @@ entityDetails language path x =
       imageCarousel (map (^. #artwork) (mapElems $ x ^. #artworks))
       mapM_ ((p ! A.class_ "white-space-break-spaces") . text) (x ^. #description)
 
-    slot1 = do
-      (h3 ! class_ "text-align-center font-size-xxx-large font-weight-500") . fromString . unpackText $ (x ^. #displayName)
+    slot1 = section ! class_ (["flex", "flex-col", "flex-wrap", "items-center", "gap-8"] @@) $ do
+      (h3 ! class_ (["text-3xl", "text-black", "font-bold"] @@)) . fromString . unpackText $ (x ^. #displayName)
       H.div ! class_ "flex flex-row flex-wrap justify-center gap-md" $ do
         likesDislikes path' language x
         entityButtons path' language x
 
         section
           ! class_ "flex flex-row flex-wrap justify-center gap-md"
-          $ detailList
+          $ detailList Nothing
           $ do
             entityBaseDetails language x
         hr

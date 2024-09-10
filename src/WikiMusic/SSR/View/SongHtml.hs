@@ -29,7 +29,7 @@ songListPage' limit offset env vv xs =
     section $ do
       H.a ! href "/songs/create" $ button $ H.small "+ new song"
       mkSortingForm vv (vv ^. #songSorting) "/user-preferences/song-sorting" "song-sorting"
-    section ! class_ "flex flex-col flex-wrap gap-4" $ mapM_ (simpleEntityCard vv "songs") sortedXs
+    section ! class_ (fromTextToAttributeValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "songs") sortedXs
     section $ do
       maybePrevPaginationButton limit offset (length (xs ^. #songs))
       maybeNextPaginationButton limit offset (length (xs ^. #songs))
@@ -61,7 +61,7 @@ songDetailPage' env vv x = do
 
 songDetails :: ViewVars -> Song -> Html
 songDetails vv x = do
-  section $ detailList $ do
+  section $ detailList Nothing $ do
     mapM_
       (detailListEntry ((^. #more % #musicTuning) |##| (vv ^. #language)) . text)
       (x ^. #musicTuning)
@@ -83,7 +83,7 @@ mkVersion vv v = H.article $ do
   hr
   h3 . text $ (v ^. #versionName) <> " " <> (v ^. #instrumentType)
 
-  detailList $ do
+  detailList Nothing $ do
     mapM_
       (detailListEntry ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
       (show <$> v ^. #lastEditedAt)

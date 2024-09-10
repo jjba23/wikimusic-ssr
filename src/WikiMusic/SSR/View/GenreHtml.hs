@@ -28,7 +28,7 @@ genreListPage' limit offset env vv xs =
       section $ do
         H.a ! href "/genres/create" $ button $ H.small "+ new genre"
         mkSortingForm vv (vv ^. #genreSorting) "/user-preferences/genre-sorting" "genre-sorting"
-      section ! class_ "flex flex-col flex-wrap gap-4" $ mapM_ (simpleEntityCard vv "genres") sortedXs
+      section ! class_ (fromTextToAttributeValue entityCardSectionClass) $ mapM_ (simpleEntityCard vv "genres") sortedXs
       section $ do
         maybePrevPaginationButton limit offset (length (xs ^. #genres))
         maybeNextPaginationButton limit offset (length (xs ^. #genres))

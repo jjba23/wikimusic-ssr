@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLabels #-}
+
 module WikiMusic.SSR.View.Components.DetailList
   ( detailList,
     detailListEntry,
@@ -14,5 +16,7 @@ detailListEntry key val =
     dt . strong . text $ key
     dd val
 
-detailList :: Html -> Html
-detailList = dl ! class_ "flex flex-wrap flex-row gap-2"
+detailList :: Maybe Class -> Html -> Html
+detailList maybeGap = dl ! class_ (["flex", "flex-wrap", "flex-row", gapClass, "justify-center"] @@)
+  where
+    gapClass = maybe "gap-8" (^. #value) maybeGap
