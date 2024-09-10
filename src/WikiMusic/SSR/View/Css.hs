@@ -3,7 +3,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoFieldSelectors #-}
 
-module WikiMusic.SSR.View.CSS where
+module WikiMusic.SSR.View.Css where
 
 import Data.Text qualified as T
 import Optics

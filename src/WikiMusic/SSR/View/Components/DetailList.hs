@@ -17,6 +17,6 @@ detailListEntry key val =
     dd val
 
 detailList :: Maybe Class -> Html -> Html
-detailList maybeGap = dl ! class_ (["flex", "flex-wrap", "flex-row", gapClass, "justify-center"] @@)
+detailList maybeGap = dl ! class_ (["flex", "flex-wrap", "flex-row", gapClass, "justify-center"])
   where
     gapClass = maybe "gap-8" (^. #value) maybeGap
