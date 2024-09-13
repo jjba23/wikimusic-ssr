@@ -46,7 +46,7 @@ artistsRoute env cookie givenSortOrder limit offset searchInput = do
   where
     vv = vvFromCookies cookie
     sortOrder = maybe (vv ^. #artistSorting) SortOrder givenSortOrder
-    limit' = maybe (Limit 25) Limit limit
+    limit' = maybe (Limit 50) Limit limit
     offset' = maybe (Offset 0) Offset offset
 
 artistRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> UUID -> m Html

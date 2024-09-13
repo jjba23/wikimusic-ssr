@@ -33,8 +33,8 @@ artistListPage' limit offset env vv xs =
         mkSortingForm vv (vv ^. #artistSorting) "/user-preferences/artist-sorting" "artist-sorting"
     section ! css cssCenteredCardGrid $ mapM_ (simpleEntityCard vv "artists") sortedXs
     section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center", "my-6"] $ do
-      maybePrevPaginationButton limit offset (length (xs ^. #artists))
-      maybeNextPaginationButton limit offset (length (xs ^. #artists))
+      maybePrevPaginationButton vv limit offset (length (xs ^. #artists))
+      maybeNextPaginationButton vv limit offset (length (xs ^. #artists))
   where
     sortedXs =
       mapMaybe

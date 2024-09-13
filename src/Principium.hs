@@ -30,6 +30,7 @@ module Principium
     emptyMap,
     (Map.!?),
     mapFilter,
+    setUnion,
   )
 where
 
@@ -41,6 +42,7 @@ import Control.Monad.Error.Class (MonadError)
 import Data.ByteString.Base16.Lazy qualified as B16
 import Data.ByteString.Lazy qualified as BL
 import Data.Map qualified as Map
+import Data.Set qualified
 import Data.Text qualified as T
 import Data.Time
 import Data.UUID qualified as UUID
@@ -95,3 +97,6 @@ emptyMap = Map.empty
 
 mapFilter :: (a -> Bool) -> Map k a -> Map k a
 mapFilter = Map.filter
+
+setUnion :: (Ord a) => Set a -> Set a -> Set a
+setUnion a b = a `Data.Set.union` b

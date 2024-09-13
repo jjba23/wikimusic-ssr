@@ -31,8 +31,8 @@ genreListPage' limit offset env vv xs =
     --
     section ! css cssCenteredCardGrid $ mapM_ (simpleEntityCard vv "genres") sortedXs
     section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center", "my-6"] $ do
-      maybePrevPaginationButton limit offset (length (xs ^. #genres))
-      maybeNextPaginationButton limit offset (length (xs ^. #genres))
+      maybePrevPaginationButton vv limit offset (length (xs ^. #genres))
+      maybeNextPaginationButton vv limit offset (length (xs ^. #genres))
   where
     sortedXs =
       mapMaybe

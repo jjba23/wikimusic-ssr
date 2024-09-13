@@ -31,9 +31,10 @@ decoder2 = either (pure $ text "Unexpected Error!") (text . T.pack . decodeUtf8)
 loginPage' :: (MonadIO m) => Env -> ViewVars -> m Html
 loginPage' env vv = do
   simplePage env vv (SimplePageTitle $ (^. #more % #loginNav) |##| (vv ^. #language)) $ do
-    section $ postForm "/login" $ do
-      requiredEmailInput "email" ((^. #forms % #email) |##| (vv ^. #language))
-      requiredPasswordInput "password" ((^. #forms % #password) |##| (vv ^. #language))
+    section ! css' ["flex", "justify-center"] $ postForm' "/login" ["flex", "flex-col", "gap-4"] $ do
+      H.div ! css' ["flex", "flex-row", "flex-wrap", "gap-8"] $ do
+        requiredEmailInput "email" ((^. #forms % #email) |##| (vv ^. #language))
+        requiredPasswordInput "password" ((^. #forms % #password) |##| (vv ^. #language))
       submitButton vv
     a ! href "/passwords/request-reset" $ "forgot password ?"
 
@@ -61,7 +62,7 @@ inviteUserPage' env vv = do
       requiredEmailInput "email" "email"
       requiredTextInput "displayName" "name"
       H.label ! for "role" $ "role"
-      select ! css cssSelect ! required "" ! name "role" ! A.id "role" $ do
+      select ! css (cssSelect vv) ! required "" ! name "role" ! A.id "role" $ do
         option ! value "wm::demo" $ "demo user"
         option ! value "wm::lowrank" $ "average user"
         option ! value "wm::maintainer" $ "wiki maintainer"

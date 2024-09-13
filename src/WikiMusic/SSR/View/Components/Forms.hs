@@ -15,7 +15,7 @@ mkSortingForm vv sortOrder action' fieldName = section
   ! method "POST"
   ! enctype "multipart/form-data"
   $ do
-    select ! css cssSelect ! onchange "this.form.submit()" ! name (textToAttrValue fieldName) $ mapM_ mkOption entries
+    select ! css (cssSelect vv) ! onchange "this.form.submit()" ! name (textToAttrValue fieldName) $ mapM_ mkOption entries
     noscript $ button ! type_ "submit" $ "submit"
   where
     mkOption :: (Text, Text) -> Html
@@ -100,23 +100,26 @@ formInput name' displayLabel isRequired type' content' = H.div $ do
     name'' = textToAttrValue name'
 
 formArea :: Text -> Maybe Text -> Bool -> Bool -> AttributeValue -> Maybe Text -> Html
-formArea name' displayLabel isRequired isMono type' content' = H.div $ do
+formArea name' displayLabel isRequired isMono type' content' = do
+  let optionalMonoCss = fromList [if isMono then "font-mono" else "font-sans"] :: Set Text
+
   H.div $ do
-    mapM_ ((H.label ! A.for name'') . text) displayLabel
-    mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)
-  H.textarea
-    ! class_ (if isMono then "rounded-2xl px-8 py-4 font-mono text-base" else "rounded-2xl px-8 py-4 font-sans")
-    H.!? (isRequired, required "")
-    ! A.name name''
-    ! A.id name''
-    ! type_ type'
-    $ text (fromMaybe "" content')
+    H.div $ do
+      mapM_ ((H.label ! A.for name'') . text) displayLabel
+      mapM_ (H.span ! class_ "color-error") (if isRequired then Just "*" else Nothing)
+    H.textarea
+      ! css (cssTextarea `setUnion` optionalMonoCss)
+      H.!? (isRequired, required "")
+      ! A.name name''
+      ! A.id name''
+      ! type_ type'
+      $ text (fromMaybe "" content')
   where
     name'' = textToAttrValue name'
 
 deleteButton :: ViewVars -> Html
 deleteButton vv =
-  button ! css cssButton ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
+  button ! css (cssButton vv) ! type_ "submit" $ text $ (^. #forms % #delete) |##| (vv ^. #language)
 
 submitButton :: ViewVars -> Html
 submitButton vv =
@@ -137,7 +140,6 @@ submitButtonNoText =
 dangerPostForm :: ViewVars -> Text -> Html -> Html
 dangerPostForm vv action' =
   H.form
-    ! class_ "margin-top-large flex direction-column align-items-flex-start"
     ! method "POST"
     ! action (textToAttrValue action')
     ! enctype "multipart/form-data"
@@ -146,15 +148,14 @@ dangerPostForm vv action' =
 postForm :: Text -> Html -> Html
 postForm action' =
   H.form
-    ! class_ "margin-top-large flex direction-column align-items-flex-start"
     ! method "POST"
     ! action (textToAttrValue action')
     ! enctype "multipart/form-data"
 
-postForm' :: Text -> Text -> Html -> Html
+postForm' :: Text -> [Text] -> Html -> Html
 postForm' action' class' =
   H.form
-    ! class_ (textToAttrValue class')
+    ! css' class'
     ! method "POST"
     ! action (textToAttrValue action')
     ! enctype "multipart/form-data"

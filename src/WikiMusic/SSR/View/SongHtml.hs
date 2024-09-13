@@ -33,8 +33,8 @@ songListPage' limit offset env vv xs =
     --
     section ! css cssCenteredCardGrid $ mapM_ (simpleEntityCard vv "songs") sortedXs
     section ! css' ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center", "items-center", "my-6"] $ do
-      maybePrevPaginationButton limit offset (length (xs ^. #songs))
-      maybeNextPaginationButton limit offset (length (xs ^. #songs))
+      maybePrevPaginationButton vv limit offset (length (xs ^. #songs))
+      maybeNextPaginationButton vv limit offset (length (xs ^. #songs))
   where
     sortedXs =
       mapMaybe
@@ -47,7 +47,7 @@ songDetailPage' env vv x = do
     entityDetails vv "songs" x
     songDetails vv x
     H.div $ H.form ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
-      select ! css cssSelect ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
+      select ! css (cssSelect vv) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
           ( \size' ->
               let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (textToAttrValue size')
@@ -59,25 +59,25 @@ songDetailPage' env vv x = do
       mapM_ (mkVersion vv) (x ^. #contents)
   where
     fontSizes :: [Text]
-    fontSizes = ["xx-small", "x-small", "small", "medium", "large", "larger", "x-large", "xx-large"]
+    fontSizes = ["xs", "sm", "md", "lg", "xl"]
 
 songDetails :: ViewVars -> Song -> Html
 songDetails vv x = do
   section $ detailList $ do
     mapM_
-      (monoDetailListEntry ((^. #more % #musicTuning) |##| (vv ^. #language)) . text)
+      (monoDetailListEntry vv ((^. #more % #musicTuning) |##| (vv ^. #language)) . text)
       (x ^. #musicTuning)
     mapM_
-      (detailListEntry ((^. #more % #musicKey) |##| (vv ^. #language)) . text)
+      (detailListEntry vv ((^. #more % #musicKey) |##| (vv ^. #language)) . text)
       (x ^. #musicKey)
     mapM_
-      (detailListEntry ((^. #more % #musicCreationDate) |##| (vv ^. #language)) . text)
+      (detailListEntry vv ((^. #more % #musicCreationDate) |##| (vv ^. #language)) . text)
       (x ^. #musicCreationDate)
     mapM_
-      (detailListEntry ((^. #more % #albumName) |##| (vv ^. #language)) . text)
+      (detailListEntry vv ((^. #more % #albumName) |##| (vv ^. #language)) . text)
       (x ^. #albumName)
     mapM_
-      (detailListEntry ((^. #more % #albumInfoLink) |##| (vv ^. #language)) . text)
+      (detailListEntry vv ((^. #more % #albumInfoLink) |##| (vv ^. #language)) . text)
       (x ^. #albumInfoLink)
 
 mkVersion :: ViewVars -> SongContent -> Html
@@ -87,25 +87,25 @@ mkVersion vv v = H.article $ do
 
   detailList $ do
     mapM_
-      (detailListEntry ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
+      (detailListEntry vv ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
       (show <$> v ^. #lastEditedAt)
-    detailListEntry ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ v ^. #createdAt)
-    monoDetailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
+    detailListEntry vv ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ v ^. #createdAt)
+    monoDetailListEntry vv ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
 
   mapM_
-    ( \asciiLegend -> details ! css cssDetails ! open "" $ do
+    ( \asciiLegend -> details ! css (cssDetails vv) ! open "" $ do
         H.summary ! css cssSummary $ "ASCII Legend"
-        (H.pre ! class_ (textToAttrValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
+        (H.pre ! class_ (textToAttrValue $ "text-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
     )
     (v ^. #asciiLegend)
   mapM_
-    ( \asciiContents -> details ! css cssDetails ! open "" $ do
+    ( \asciiContents -> details ! css (cssDetails vv) ! open "" $ do
         H.summary ! css cssSummary $ "ASCII Content"
-        (H.pre ! class_ (textToAttrValue $ "font-size-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
+        (H.pre ! class_ (textToAttrValue $ "text-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
     )
     (v ^. #asciiContents)
   mapM_
-    ( \pdfContents -> details ! css cssDetails ! open "" $ do
+    ( \pdfContents -> details ! css (cssDetails vv) ! open "" $ do
         when (pdfContents /= "data:application/octet-stream;base64,") $ do
           H.summary ! css cssSummary $ "PDF Content"
           H.iframe

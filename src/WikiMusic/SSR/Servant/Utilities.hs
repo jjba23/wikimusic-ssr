@@ -90,7 +90,7 @@ vvFromCookies cookie = ViewVars {..}
     language = Language {value = fromMaybe "en" (cookieMap !? localeCookieName)}
     uiMode = UiMode {value = fromMaybe "light" (cookieMap !? uiModeCookieName)}
     authToken = AuthToken {value = decodeToken $ fromMaybe "" (cookieMap !? authCookieName)}
-    songAsciiSize = SongAsciiSize {value = fromMaybe "medium" (cookieMap !? songAsciiSizeCookieName)}
+    songAsciiSize = SongAsciiSize {value = fromMaybe "sm" (cookieMap !? songAsciiSizeCookieName)}
     artistSorting =
       SortOrder
         { value = fromMaybe "created-at-desc" (cookieMap !? artistSortingCookieName)
@@ -103,7 +103,7 @@ vvFromCookies cookie = ViewVars {..}
       SortOrder
         { value = fromMaybe "created-at-desc" (cookieMap !? genreSortingCookieName)
         }
-    palette = Palette {value = fromMaybe "mauve" (cookieMap !? paletteCookieName)}
+    palette = Palette {value = fromMaybe "purple" (cookieMap !? paletteCookieName)}
 
 errorRoute :: (MonadIO m, MonadError ServerError m) => Env -> Maybe Text -> Maybe Text -> Maybe Int -> Maybe Text -> m Html
 errorRoute env cookie _ maybeCode maybeMessage = do

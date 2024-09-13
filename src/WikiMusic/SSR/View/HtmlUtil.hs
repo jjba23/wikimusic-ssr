@@ -9,7 +9,7 @@
 module WikiMusic.SSR.View.HtmlUtil where
 
 import Principium
-import Text.Blaze.Html5 as H hiding (div)
+import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import WikiMusic.SSR.View.Components.Footer
 import WikiMusic.SSR.View.Components.PageTop
@@ -57,7 +57,8 @@ simplePage env vv title' body' = do
     sharedHead
     bodyWithFooter vv $ do
       sharedPageTop Nothing vv
-      (H.h2 ! css' ["text-xl", "text-slate-600", "font-sans", "font-bold"]) . text $ title' ^. #value
+      (H.div ! css' ["text-center", "my-4"]) $ do
+        (H.h2 ! css' ["text-xl", "text-slate-600", "font-sans", "font-bold"]) . text $ title' ^. #value
       body'
 
 paginationOffsetJS :: Text -> Text -> Text
@@ -72,13 +73,13 @@ paginationOffsetJS offset' newOffset =
                  })
                  ()|]
 
-maybeNextPaginationButton :: Limit -> Offset -> Int -> Html
-maybeNextPaginationButton _ _ 0 = pure ()
-maybeNextPaginationButton (Limit 0) _ _ = pure ()
-maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
+maybeNextPaginationButton :: ViewVars -> Limit -> Offset -> Int -> Html
+maybeNextPaginationButton _ _ _ 0 = pure ()
+maybeNextPaginationButton _ (Limit 0) _ _ = pure ()
+maybeNextPaginationButton vv (Limit limit) (Offset offset) itemSize =
   when (itemSize == limit)
     $ H.button
-    ! css cssButton
+    ! css (cssButton vv)
     ! onclick (textToAttrValue . minify $ paginationOffsetJS offset' newOffset)
     $ "("
     <> pageNum
@@ -86,18 +87,18 @@ maybeNextPaginationButton (Limit limit) (Offset offset) itemSize =
   where
     offset' = show offset
     newOffset = show $ offset + limit
-    pageNum = show $ (offset `div` limit) + 1
+    pageNum = show $ (offset `Principium.div` limit) + 1
     minify =
       replaceText
         "\n"
         ""
 
-maybePrevPaginationButton :: Limit -> Offset -> Int -> Html
-maybePrevPaginationButton (Limit 0) _ _ = pure ()
-maybePrevPaginationButton (Limit limit) (Offset offset) _ =
+maybePrevPaginationButton :: ViewVars -> Limit -> Offset -> Int -> Html
+maybePrevPaginationButton _ (Limit 0) _ _ = pure ()
+maybePrevPaginationButton vv (Limit limit) (Offset offset) _ =
   when (offset > 0)
     $ H.button
-    ! css cssButton
+    ! css (cssButton vv)
     ! onclick (textToAttrValue . minify $ paginationOffsetJS offset' newOffset)
     $ "< previous page ("
     <> pageNum
@@ -105,8 +106,5 @@ maybePrevPaginationButton (Limit limit) (Offset offset) _ =
   where
     offset' = show offset
     newOffset = show $ offset - limit
-    pageNum = show $ (offset `div` limit) - 1
-    minify =
-      replaceText
-        "\n"
-        ""
+    pageNum = show $ (offset `Principium.div` limit) - 1
+    minify = replaceText "\n" ""

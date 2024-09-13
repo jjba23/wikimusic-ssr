@@ -23,7 +23,8 @@ simpleFooter vv = H.footer ! css' ["flex", "flex-col", "justify-center", "gap-6"
 
 bodyWithFooter :: ViewVars -> Html -> Html
 bodyWithFooter vv x = do
-  body ! css' ["container", "mx-auto"] $ do
-    _ <- x
-    hr
-    simpleFooter vv
+  body ! css' ["bg-" <> vv ^. #palette % #value <> "-100"] $ do
+    H.div ! css' [if vv ^. #uiMode % #value == "dark" then "bg-black/70" else "bg-white/80", "h-auto"] $ do
+      _ <- x
+      hr
+      simpleFooter vv

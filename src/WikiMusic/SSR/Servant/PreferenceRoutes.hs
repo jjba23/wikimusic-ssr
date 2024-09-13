@@ -58,4 +58,4 @@ setPaletteRoute :: (MonadError ServerError m) => Env -> Maybe Text -> MultipartD
 setPaletteRoute env maybeReferer multipartData =
   setCookieRoute (env ^. #cfg % #cookie) (fromMaybe "/songs" maybeReferer) (mapFromList [(paletteCookieName, palette')])
   where
-    palette' = fromForm multipartData "mauve" "palette"
+    palette' = fromForm multipartData "purple" "palette"

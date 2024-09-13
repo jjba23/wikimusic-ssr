@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-warn-missing-signatures #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module WikiMusic.SSR.View.Components.Other
@@ -37,19 +36,34 @@ dislikeCount entity =
 mkIdentifierHref :: Text -> UUID -> AttributeValue
 mkIdentifierHref path identifier = fromString ("/" <> unpackText path <> "/" <> show identifier)
 
-simpleEntityCard vv path entity = article ! css' ["bg-slate-100", "rounded-2xl", "flex", "flex-wrap", "gap-4", "flex-row", "md:flex-col", "max-w-56", "border", "border-gray-300"] $ do
-  maybeImg
-  H.div ! css' ["px-4", "py-4", "flex", "flex-col", "gap-4", "align-center"] $ do
-    a
-      ! href (mkIdentifierHref path (entity ^. #identifier))
-      $ (h3 ! css' ["text-xl", "font-bold", "break-words", "text-center"])
-      . text
-      $ entity
-      ^. #displayName
-    detailList $ do
-      detailListEntry ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount entity)
-      detailListEntry ((^. #more % #dislikes) |##| (vv ^. #language)) (text $ dislikeCount entity)
-      detailListEntry ((^. #more % #views) |##| (vv ^. #language)) (text . packText . show $ entity ^. #viewCount)
+-- use dark: in tailwind to use system dark / light mode, or use vv to read from cookie
+simpleEntityCard vv path entity = article
+  ! css'
+    [ "bg-slate-100",
+      "rounded-2xl",
+      "flex",
+      "flex-wrap",
+      "gap-4",
+      "flex-row",
+      "md:flex-col",
+      "max-w-56",
+      "border",
+      if vv ^. #uiMode % #value == "dark" then "dark:bg-black/70" else "bg-white/80",
+      "border-" <> vv ^. #palette % #value <> "-300"
+    ]
+  $ do
+    maybeImg
+    H.div ! css' ["px-4", "py-4", "flex", "flex-col", "gap-4", "align-center"] $ do
+      a
+        ! href (mkIdentifierHref path (entity ^. #identifier))
+        $ (h3 ! css' ["text-xl", "font-bold", "break-words", "text-center", if vv ^. #uiMode % #value == "dark" then "text-white" else "text-black"])
+        . text
+        $ entity
+        ^. #displayName
+      detailList $ do
+        detailListEntry vv ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount entity)
+        detailListEntry vv ((^. #more % #dislikes) |##| (vv ^. #language)) (text $ dislikeCount entity)
+        detailListEntry vv ((^. #more % #views) |##| (vv ^. #language)) (text . packText . show $ entity ^. #viewCount)
   where
     artworks = map (\x -> x ^. #artwork) (mapElems $ entity ^. #artworks) :: [Artwork]
     sortedArts = sortBy (\x y -> compare (x ^. #orderValue) (y ^. #orderValue)) artworks
@@ -84,67 +98,88 @@ entityDetailsSkeleton slot0 slot1 =
     H.div ! css' ["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] $ do
       slot1
 
-entityDetails language path x =
-  entityDetailsSkeleton slot0 slot1
+verboseLink' uri = a ! href (fromString . unpackText $ uri) $ text uri
+
+entityLinks vv x = do
+  mapM_
+    (detailListEntry vv "Spotify" . verboseLink')
+    (x ^. #spotifyUrl)
+  mapM_
+    (detailListEntry vv "Wikipedia" . verboseLink')
+    (x ^. #wikipediaUrl)
+  mapM_
+    (detailListEntry vv "YouTube" . verboseLink')
+    (x ^. #youtubeUrl)
+  mapM_
+    (detailListEntry vv "SoundCloud" . verboseLink')
+    (x ^. #soundcloudUrl)
+
+slot0 x = do
+  imageCarousel (map (^. #artwork) (mapElems $ x ^. #artworks))
+  mapM_ ((p ! A.class_ "white-space-break-spaces") . text) (x ^. #description)
+
+slot1 vv path x = section
+  ! css'
+    [ "flex",
+      "flex-col",
+      "flex-wrap",
+      "items-center",
+      "gap-8"
+    ]
+  $ do
+    ( h3
+        ! css'
+          [ "text-3xl",
+            "text-black",
+            "font-bold",
+            if vv ^. #uiMode % #value == "dark" then "text-white" else "text-black"
+          ]
+      )
+      . fromString
+      . unpackText
+      $ (x ^. #displayName)
+    H.div ! class_ "flex flex-row flex-wrap justify-center gap-md" $ do
+      likesDislikes vv path' x
+      entityButtons vv path' x
+
+      section
+        ! class_ "flex flex-row flex-wrap justify-center gap-md"
+        $ detailList
+        $ do
+          entityBaseDetails vv x
+      hr
+      entityLinks vv x
   where
-    verboseLink' uri = a ! href (fromString . unpackText $ uri) $ text uri
     path' = unpackText path
-    entityLinks = do
-      mapM_
-        (detailListEntry "Spotify" . verboseLink')
-        (x ^. #spotifyUrl)
-      mapM_
-        (detailListEntry "Wikipedia" . verboseLink')
-        (x ^. #wikipediaUrl)
-      mapM_
-        (detailListEntry "YouTube" . verboseLink')
-        (x ^. #youtubeUrl)
-      mapM_
-        (detailListEntry "SoundCloud" . verboseLink')
-        (x ^. #soundcloudUrl)
-    slot0 = do
-      imageCarousel (map (^. #artwork) (mapElems $ x ^. #artworks))
-      mapM_ ((p ! A.class_ "white-space-break-spaces") . text) (x ^. #description)
 
-    slot1 = section ! css' ["flex", "flex-col", "flex-wrap", "items-center", "gap-8"] $ do
-      (h3 ! css' ["text-3xl", "text-black", "font-bold"]) . fromString . unpackText $ (x ^. #displayName)
-      H.div ! class_ "flex flex-row flex-wrap justify-center gap-md" $ do
-        likesDislikes path' language x
-        entityButtons path' language x
+entityDetails vv path x = do
+  entityDetailsSkeleton (slot0 x) (slot1 vv path x)
 
-        section
-          ! class_ "flex flex-row flex-wrap justify-center gap-md"
-          $ detailList
-          $ do
-            entityBaseDetails language x
-        hr
-        entityLinks
-
-likesDislikes path' vv x = do
-  postForm' (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) "" $ do
-    button ! css cssButton ! type_ "submit" $ do
+likesDislikes vv path' x = do
+  postForm (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) $ do
+    button ! css (cssButton vv) ! type_ "submit" $ do
       H.span "+"
       text ((^. #buttons % #like) |##| (vv ^. #language))
-  postForm' (fromString ("/" <> path' <> "/dislike/" <> show (x ^. #identifier))) "" $ do
-    button ! css cssButton ! type_ "submit" $ do
+  postForm (fromString ("/" <> path' <> "/dislike/" <> show (x ^. #identifier))) $ do
+    button ! css (cssButton vv) ! type_ "submit" $ do
       H.span "-"
       text ((^. #buttons % #dislike) |##| (vv ^. #language))
 
 entityBaseDetails vv x = do
-  detailListEntry ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount x)
-  detailListEntry ((^. #more % #dislikes) |##| (vv ^. #language)) (text $ dislikeCount x)
-  detailListEntry ((^. #more % #views) |##| (vv ^. #language)) (show $ x ^. #viewCount)
-  detailListEntry ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ x ^. #createdAt)
+  detailListEntry vv ((^. #more % #likes) |##| (vv ^. #language)) (text $ likeCount x)
+  detailListEntry vv ((^. #more % #dislikes) |##| (vv ^. #language)) (text $ dislikeCount x)
+  detailListEntry vv ((^. #more % #views) |##| (vv ^. #language)) (show $ x ^. #viewCount)
+  detailListEntry vv ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ x ^. #createdAt)
   mapM_
-    (detailListEntry ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
+    (detailListEntry vv ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
     (show <$> x ^. #lastEditedAt)
-  detailListEntry ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ x ^. #createdBy)
+  detailListEntry vv ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ x ^. #createdBy)
 
-entityButtons path' vv x = do
+entityButtons vv path' x = do
   a
     ! href (fromString ("/" <> path' <> "/edit/" <> show (x ^. #identifier)))
     $ button
-    ! css cssButton
+    ! css (cssButton vv)
     $ text ((^. #buttons % #edit) |##| (vv ^. #language))
   dangerPostForm vv (fromString ("/" <> path' <> "/delete/" <> show (x ^. #identifier))) $ do
     deleteButton vv

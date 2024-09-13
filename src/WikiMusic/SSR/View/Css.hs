@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE NoFieldSelectors #-}
@@ -10,6 +10,7 @@ import Optics
 import Relude
 import Text.Blaze.Html qualified as BlazeHtml
 import Text.Blaze.Html5.Attributes qualified as A
+import WikiMusic.SSR.Model.Api
 
 newtype Css = Css {className :: Text} deriving (Generic, Eq, Show)
 
@@ -19,7 +20,7 @@ cssToAttrValue :: [Text] -> BlazeHtml.AttributeValue
 cssToAttrValue = fromString . T.unpack . joinClasses . fromList
   where
     joinClasses :: Set Text -> Text
-    joinClasses = T.intercalate " " . toList
+    joinClasses = T.intercalate " " . sort . toList
 
 css' :: [Text] -> BlazeHtml.Attribute
 css' xs = css (fromList xs :: Set Text)
@@ -42,40 +43,35 @@ cssSubmitButton =
       "px-5",
       "py-2.5",
       "text-center",
-      "me-2",
-      "mb-2",
       "font-sans",
       "w-fit"
     ]
 
-cssSelect :: Set Text
-cssSelect =
+cssSelect :: ViewVars -> Set Text
+cssSelect vv =
   fromList
     [ "text-black",
-      "bg-gray-100/75",
-      "hover:bg-accent-500",
+      "bg-" <> vv ^. #palette % #value <> "-200",
+      "hover:bg-" <> vv ^. #palette % #value <> "-300",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-gray-300",
       "font-medium",
       "rounded-2xl",
-      "text-lg",
+      "text-sm",
       "px-8",
       "py-2",
-      "me-2",
-      "mb-2",
       "font-sans",
       "w-fit",
       "h-fit",
-      "border"
+      "border-" <> vv ^. #palette % #value <> "-400"
     ]
 
-cssButton :: Set Text
-cssButton =
+cssButton :: ViewVars -> Set Text
+cssButton vv =
   fromList
     [ "text-black",
-      "bg-gray-100/75",
-      "hover:bg-accent-500",
+      "hover:bg-" <> vv ^. #palette % #value <> "-300",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-gray-300",
@@ -84,24 +80,24 @@ cssButton =
       "text-lg",
       "px-5",
       "py-2.5",
-      "me-2",
-      "mb-2",
       "font-sans",
       "w-fit",
-      "border"
+      "border",
+      "border-" <> vv ^. #palette % #value <> "-400",
+      "bg-" <> vv ^. #palette % #value <> "-200"
     ]
 
 cssCenteredCardGrid :: Set Text
 cssCenteredCardGrid = fromList ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center"]
 
 cssInput :: Set Text
-cssInput = fromList ["rounded-2xl", "px-5", "py-2.5", "font-sans"]
+cssInput = fromList ["rounded-2xl", "px-5", "py-2.5", "font-sans", "w-full", "bg-white"]
 
 cssTextarea :: Set Text
-cssTextarea = fromList ["rounded-2xl", "px-5", "py-2.5"]
+cssTextarea = fromList ["rounded-2xl", "px-5", "py-2.5", "w-full", "h-fit", "min-h-72"]
 
-cssDetails :: Set Text
-cssDetails =
+cssDetails :: ViewVars -> Set Text
+cssDetails vv =
   fromList
     [ "border-2",
       "border",
@@ -109,7 +105,9 @@ cssDetails =
       "p-4",
       "[&_svg]:open:-rotate-180]",
       "my-4",
-      "rounded-2xl"
+      "rounded-2xl",
+      if vv ^. #uiMode % #value == "dark" then "bg-black/70" else "bg-white/80",
+      if vv ^. #uiMode % #value == "dark" then "text-white" else "text-black"
     ]
 
 cssSummary :: Set Text
