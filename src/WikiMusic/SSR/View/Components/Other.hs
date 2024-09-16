@@ -92,10 +92,10 @@ imageCarousel artworks =
 
 entityDetailsSkeleton :: Html -> Html -> Html
 entityDetailsSkeleton slot0 slot1 =
-  H.div ! css' ["flex", "flex-row", "flex-wrap", "gap-lg"] $ do
-    H.div ! css' ["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] $ do
+  H.div ! css' ["flex", "flex-row", "flex-wrap", "container", "mx-auto"] $ do
+    H.div ! css' ["flex", "flex-col", "flex-wrap", "w-full", "md:w-1/2"] $ do
       slot0
-    H.div ! css' ["flex", "flex-col", "flex-wrap", "gap-lg", "w-full", "md:w-1/2"] $ do
+    H.div ! css' ["flex", "flex-col", "flex-wrap", "w-full", "md:w-1/2", "my-4"] $ do
       slot1
 
 verboseLink' uri = a ! href (fromString . unpackText $ uri) $ text uri

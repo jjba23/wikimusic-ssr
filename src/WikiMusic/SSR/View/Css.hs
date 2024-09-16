@@ -51,8 +51,8 @@ cssSelect :: ViewVars -> Set Text
 cssSelect vv =
   fromList
     [ "text-black",
-      "bg-" <> vv ^. #palette % #value <> "-200",
-      "hover:bg-" <> vv ^. #palette % #value <> "-300",
+      "bg-" <> vv ^. #palette % #value <> "-200/40",
+      "hover:bg-" <> vv ^. #palette % #value <> "-300/40",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-gray-300",
@@ -64,14 +64,14 @@ cssSelect vv =
       "font-sans",
       "w-fit",
       "h-fit",
-      "border-" <> vv ^. #palette % #value <> "-400"
+      "border-" <> vv ^. #palette % #value <> "-400/40"
     ]
 
 cssButton :: ViewVars -> Set Text
 cssButton vv =
   fromList
     [ "text-black",
-      "hover:bg-" <> vv ^. #palette % #value <> "-300",
+      "hover:bg-" <> vv ^. #palette % #value <> "-300/40",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-gray-300",
@@ -83,18 +83,18 @@ cssButton vv =
       "font-sans",
       "w-fit",
       "border",
-      "border-" <> vv ^. #palette % #value <> "-400",
-      "bg-" <> vv ^. #palette % #value <> "-200"
+      "border-" <> vv ^. #palette % #value <> "-400/40",
+      "bg-" <> vv ^. #palette % #value <> "-200/40"
     ]
 
 cssCenteredCardGrid :: Set Text
 cssCenteredCardGrid = fromList ["flex", "flex-row", "flex-wrap", "gap-4", "justify-center", "align-center"]
 
 cssInput :: Set Text
-cssInput = fromList ["rounded-2xl", "px-5", "py-2.5", "font-sans", "w-full", "bg-white"]
+cssInput = fromList ["rounded-2xl", "px-5", "py-2.5", "font-sans", "w-full", "bg-white/40"]
 
 cssTextarea :: Set Text
-cssTextarea = fromList ["rounded-2xl", "px-5", "py-2.5", "w-full", "h-fit", "min-h-72"]
+cssTextarea = fromList ["rounded-2xl", "px-5", "py-2.5", "w-full", "h-fit", "min-h-72", "bg-white/40"]
 
 cssDetails :: ViewVars -> Set Text
 cssDetails vv =

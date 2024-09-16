@@ -46,7 +46,7 @@ songDetailPage' env vv x = do
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ do
     entityDetails vv "songs" x
     songDetails vv x
-    H.div $ H.form ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
+    H.form ! css' ["text-center"] ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
       select ! css (cssSelect vv) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
           ( \size' ->
@@ -55,7 +55,7 @@ songDetailPage' env vv x = do
           )
           fontSizes
       noscript $ button ! type_ "submit" $ "submit"
-    section $ do
+    section ! css' ["container", "mx-auto"] $ do
       mapM_ (mkVersion vv) (x ^. #contents)
   where
     fontSizes :: [Text]
@@ -81,43 +81,45 @@ songDetails vv x = do
       (x ^. #albumInfoLink)
 
 mkVersion :: ViewVars -> SongContent -> Html
-mkVersion vv v = H.article $ do
+mkVersion vv v = do
   hr
-  (h3 ! css' ["text-xl", "font-bold"]) . text $ (v ^. #versionName) <> " " <> (v ^. #instrumentType)
+  H.article ! css' ["my-6"] $ do
+    (h3 ! css' ["text-xl", "font-bold"]) . text $ (v ^. #versionName) <> " " <> (v ^. #instrumentType)
 
-  detailList $ do
+    detailList $ do
+      mapM_
+        (detailListEntry vv ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
+        (show <$> v ^. #lastEditedAt)
+      detailListEntry vv ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ v ^. #createdAt)
+      monoDetailListEntry vv ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
+
     mapM_
-      (detailListEntry vv ((^. #more % #lastEditedAt) |##| (vv ^. #language)))
-      (show <$> v ^. #lastEditedAt)
-    detailListEntry vv ((^. #more % #createdAt) |##| (vv ^. #language)) (show $ v ^. #createdAt)
-    monoDetailListEntry vv ((^. #more % #createdBy) |##| (vv ^. #language)) (show $ v ^. #createdBy)
-
-  mapM_
-    ( \asciiLegend -> details ! css (cssDetails vv) ! open "" $ do
-        H.summary ! css cssSummary $ "ASCII Legend"
-        (H.pre ! class_ (textToAttrValue $ "text-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
-    )
-    (v ^. #asciiLegend)
-  mapM_
-    ( \asciiContents -> details ! css (cssDetails vv) ! open "" $ do
-        H.summary ! css cssSummary $ "ASCII Content"
-        (H.pre ! class_ (textToAttrValue $ "text-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
-    )
-    (v ^. #asciiContents)
-  mapM_
-    ( \pdfContents -> details ! css (cssDetails vv) ! open "" $ do
-        when (pdfContents /= "data:application/octet-stream;base64,") $ do
-          H.summary ! css cssSummary $ "PDF Content"
-          H.iframe
-            ! css' ["w-full", "h-full", "block"]
-            ! customAttribute "loading" "lazy"
-            ! customAttribute "allowed" ""
-            ! customAttribute "allowfullscreen" ""
-            ! customAttribute "referrerpolicy" "noreferrer"
-            ! A.src (textToAttrValue pdfContents)
-            $ ""
-    )
-    (v ^. #pdfContents)
+      ( \asciiLegend -> details ! css (cssDetails vv) ! open "" $ do
+          H.summary ! css cssSummary $ "ASCII Legend"
+          (H.pre ! class_ (textToAttrValue $ "text-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiLegend
+      )
+      (v ^. #asciiLegend)
+    mapM_
+      ( \asciiContents -> details ! css (cssDetails vv) ! open "" $ do
+          H.summary ! css cssSummary $ "ASCII Content"
+          (H.pre ! class_ (textToAttrValue $ "text-" <> (vv ^. #songAsciiSize % #value))) . text $ asciiContents
+      )
+      (v ^. #asciiContents)
+    mapM_
+      ( \pdfContents ->
+          when (pdfContents /= "data:application/octet-stream;base64,") $ do
+            details ! css (cssDetails vv) ! open "" $ do
+              H.summary ! css cssSummary $ "PDF Content"
+              H.iframe
+                ! css' ["w-full", "h-full", "block"]
+                ! customAttribute "loading" "lazy"
+                ! customAttribute "allowed" ""
+                ! customAttribute "allowfullscreen" ""
+                ! customAttribute "referrerpolicy" "noreferrer"
+                ! A.src (textToAttrValue pdfContents)
+                $ ""
+      )
+      (v ^. #pdfContents)
 
 songCreatePage' :: (MonadIO m) => Env -> ViewVars -> m Html
 songCreatePage' env vv = do

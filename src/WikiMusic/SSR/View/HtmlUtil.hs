@@ -34,7 +34,7 @@ mkSharedHead _ _ pageTitle = do
                    src: url('https://raw.githubusercontent.com/protesilaos/iosevka-comfy/master/iosevka-comfy-wide/TTF/iosevka-comfy-wide-normalregularupright.ttf');
                  }                              
         |]
-    H.script ! src "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp,container-queries" $ ""
+    H.script ! src "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,container-queries" $ ""
     H.script
       . text
       $ [trimming|

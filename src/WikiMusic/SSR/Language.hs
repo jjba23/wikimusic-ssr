@@ -216,7 +216,7 @@ dictionary =
             createdBy =
               DictTerm
                 { en = "added by:",
-                  nl = "toegevoeg door:"
+                  nl = "toegevoegd door:"
                 },
             createdAt =
               DictTerm
