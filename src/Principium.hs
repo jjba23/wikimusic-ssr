@@ -15,7 +15,6 @@ module Principium
     UUID.UUID,
     --
     maybeDecodeUtf8,
-    BL.ByteString,
     textToAttrValue,
     maybeDecodeBase16,
     uuidToText,
@@ -31,6 +30,7 @@ module Principium
     (Map.!?),
     mapFilter,
     setUnion,
+    takeText,
   )
 where
 
@@ -49,7 +49,7 @@ import Data.UUID qualified as UUID
 import Free.AlaCarte
 import NeatInterpolation hiding (text)
 import Optics hiding (uncons)
-import Relude hiding (ByteString)
+import Relude
 import Text.Blaze.Html as BlazeHtml
 import WikiMusic.Model.Other
 import WikiMusic.SSR.Language
@@ -60,6 +60,7 @@ import WikiMusic.SSR.View.Css
 
 --
 
+maybeDecodeUtf8 :: ByteString -> Either UnicodeException Text
 maybeDecodeUtf8 = decodeUtf8'
 
 textToAttrValue :: Text -> BlazeHtml.AttributeValue
@@ -100,3 +101,6 @@ mapFilter = Map.filter
 
 setUnion :: (Ord a) => Set a -> Set a -> Set a
 setUnion a b = a `Data.Set.union` b
+
+takeText :: Int -> Text -> Text
+takeText = T.take

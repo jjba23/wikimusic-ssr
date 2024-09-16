@@ -47,12 +47,32 @@ cssSubmitButton =
       "w-fit"
     ]
 
+cssButton :: ViewVars -> Set Text
+cssButton vv =
+  fromList
+    [ if vv ^. #uiMode % #value == "dark" then "text-white" else "text-black",
+      "hover:bg-" <> vv ^. #palette % #value <> "-500/40",
+      "focus:outline-none",
+      "focus:ring-4",
+      "focus:ring-gray-300",
+      "font-medium",
+      "rounded-2xl",
+      "text-md",
+      "px-5",
+      "py-2.5",
+      "font-sans",
+      "w-fit",
+      "border",
+      "border-" <> vv ^. #palette % #value <> "-500/40",
+      "bg-" <> vv ^. #palette % #value <> "-400/40"
+    ]
+
 cssSelect :: ViewVars -> Set Text
 cssSelect vv =
   fromList
-    [ "text-black",
-      "bg-" <> vv ^. #palette % #value <> "-200/40",
-      "hover:bg-" <> vv ^. #palette % #value <> "-300/40",
+    [ if vv ^. #uiMode % #value == "dark" then "text-white" else "text-black",
+      "bg-" <> vv ^. #palette % #value <> "-400/40",
+      "hover:bg-" <> vv ^. #palette % #value <> "-500/40",
       "focus:outline-none",
       "focus:ring-4",
       "focus:ring-gray-300",
@@ -60,31 +80,12 @@ cssSelect vv =
       "rounded-2xl",
       "text-sm",
       "px-8",
+      "cursor-pointer",
       "py-2",
       "font-sans",
       "w-fit",
       "h-fit",
       "border-" <> vv ^. #palette % #value <> "-400/40"
-    ]
-
-cssButton :: ViewVars -> Set Text
-cssButton vv =
-  fromList
-    [ "text-black",
-      "hover:bg-" <> vv ^. #palette % #value <> "-300/40",
-      "focus:outline-none",
-      "focus:ring-4",
-      "focus:ring-gray-300",
-      "font-medium",
-      "rounded-2xl",
-      "text-lg",
-      "px-5",
-      "py-2.5",
-      "font-sans",
-      "w-fit",
-      "border",
-      "border-" <> vv ^. #palette % #value <> "-400/40",
-      "bg-" <> vv ^. #palette % #value <> "-200/40"
     ]
 
 cssCenteredCardGrid :: Set Text
@@ -112,3 +113,6 @@ cssDetails vv =
 
 cssSummary :: Set Text
 cssSummary = fromList ["text-xl", "font-bold", "cursor-pointer"]
+
+cssLink :: ViewVars -> Set Text
+cssLink vv = fromList ["text-" <> vv ^. #palette % #value <> "-500", "font-bold", "cursor-pointer"]

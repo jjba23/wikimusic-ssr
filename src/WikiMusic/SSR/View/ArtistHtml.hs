@@ -49,7 +49,7 @@ artistDetailPage' env vv x = do
 artistCreatePage' :: (MonadIO m) => Env -> ViewVars -> m Html
 artistCreatePage' env vv = do
   simplePage env vv (SimplePageTitle "Create artist") $ do
-    section $ do
+    section ! css' ["container", "mx-auto"] $ do
       postForm "/artists/create" $ do
         requiredTextInput "displayName" "artist name"
         optionalTextArea "description" "description"
@@ -62,7 +62,7 @@ artistCreatePage' env vv = do
 artistEditPage' :: (MonadIO m) => Env -> ViewVars -> Artist -> m Html
 artistEditPage' env vv artist = do
   simplePage env vv (SimplePageTitle "Edit artist") $ do
-    section $ do
+    section ! css' ["container", "mx-auto"] $ do
       postForm ("/artists/edit/" <> (T.pack . show $ artist ^. #identifier)) $ do
         requiredTextInput' "displayName" "artist name" (Just $ artist ^. #displayName)
         optionalTextArea' "description" "description" (artist ^. #description)
@@ -72,6 +72,6 @@ artistEditPage' env vv artist = do
         optionalTextInput' "soundcloudUrl" "soundcloud URL" (artist ^. #soundcloudUrl)
         submitButton vv
 
-    entityArtworkForm vv "artists" (map (^. #artwork) . Map.elems $ artist ^. #artworks)
-    hr
-    entityNewArtworkForm vv "artists" (artist ^. #identifier)
+      entityArtworkForm vv "artists" (map (^. #artwork) . Map.elems $ artist ^. #artworks)
+      hr
+      entityNewArtworkForm vv "artists" (artist ^. #identifier)

@@ -47,7 +47,7 @@ genreDetailPage' env vv x = do
 genreCreatePage' :: (MonadIO m) => Env -> ViewVars -> m Html
 genreCreatePage' env vv =
   simplePage env vv (SimplePageTitle "Create genre") $ do
-    section $ do
+    section ! css' ["container", "mx-auto"] $ do
       postForm "/genres/create" $ do
         requiredTextInput "displayName" "genre name"
         optionalTextArea "description" "description"
@@ -60,7 +60,7 @@ genreCreatePage' env vv =
 genreEditPage' :: (MonadIO m) => Env -> ViewVars -> Genre -> m Html
 genreEditPage' env vv genre =
   simplePage env vv (SimplePageTitle "Edit genre") $ do
-    section $ do
+    section ! css' ["container", "mx-auto"] $ do
       postForm ("/genres/edit/" <> (packText . show $ genre ^. #identifier)) $ do
         requiredTextInput' "displayName" "genre name" (Just $ genre ^. #displayName)
         optionalTextArea' "description" "description" (genre ^. #description)
@@ -70,6 +70,6 @@ genreEditPage' env vv genre =
         optionalTextInput' "soundcloudUrl" "soundcloud URL" (genre ^. #soundcloudUrl)
 
         submitButton vv
-    entityArtworkForm vv "genres" (map (^. #artwork) . mapElems $ genre ^. #artworks)
-    hr
-    entityNewArtworkForm vv "genres" (genre ^. #identifier)
+      entityArtworkForm vv "genres" (map (^. #artwork) . mapElems $ genre ^. #artworks)
+      hr
+      entityNewArtworkForm vv "genres" (genre ^. #identifier)

@@ -20,13 +20,10 @@ errorPage' env vv _ maybeMessage = do
       $ do
         case maybeDecoded of
           Nothing -> text "Unexpected Error!"
-          Just maybeDecodedError -> decoder2 maybeDecodedError
+          Just maybeDecodedError -> either (pure $ text "Unexpected Error!") (text . T.pack . decodeUtf8) maybeDecodedError
   where
     messageCauses = T.intercalate " - " causeStrings
     causeStrings = catMaybes [Just "Error", if T.isInfixOf "504" (fromMaybe "Error ocurred!" maybeMessage) then Just "Gateway Timeout" else Nothing]
-
-decoder2 :: Either String ByteString -> Html
-decoder2 = either (pure $ text "Unexpected Error!") (text . T.pack . decodeUtf8)
 
 loginPage' :: (MonadIO m) => Env -> ViewVars -> m Html
 loginPage' env vv = do
@@ -36,7 +33,7 @@ loginPage' env vv = do
         requiredEmailInput "email" ((^. #forms % #email) |##| (vv ^. #language))
         requiredPasswordInput "password" ((^. #forms % #password) |##| (vv ^. #language))
       submitButton vv
-    a ! href "/passwords/request-reset" $ "forgot password ?"
+    a ! css (cssLink vv) ! href "/passwords/request-reset" $ "forgot password ?"
 
 doPasswordResetPage' :: (MonadIO m) => Env -> ViewVars -> Maybe Text -> m Html
 doPasswordResetPage' env vv t = do

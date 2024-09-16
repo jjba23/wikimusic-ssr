@@ -46,20 +46,21 @@ songDetailPage' env vv x = do
   simplePage env vv (SimplePageTitle $ (^. #titles % #songsPage) |##| (vv ^. #language)) $ do
     entityDetails vv "songs" x
     songDetails vv x
-    H.form ! css' ["text-center"] ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
+    H.form ! css' ["flex", "flex-row", "flex-wrap", "justify-center", "gap-4", "items-center"] ! action "/user-preferences/song-ascii-size" ! method "POST" ! enctype "multipart/form-data" $ do
+      H.label ! for "song-ascii-size" $ "ascii size:"
       select ! css (cssSelect vv) ! onchange "this.form.submit()" ! type_ "checkbox" ! name "song-ascii-size" ! A.id "song-ascii-size" $ do
         mapM_
-          ( \size' ->
+          ( \(size', sizeName) ->
               let mkOption = option H.!? ((vv ^. #songAsciiSize % #value) == size', selected "true") ! value (textToAttrValue size')
-               in mkOption . text $ size'
+               in mkOption . text $ sizeName
           )
           fontSizes
       noscript $ button ! type_ "submit" $ "submit"
     section ! css' ["container", "mx-auto"] $ do
       mapM_ (mkVersion vv) (x ^. #contents)
   where
-    fontSizes :: [Text]
-    fontSizes = ["xs", "sm", "md", "lg", "xl"]
+    fontSizes :: [(Text, Text)]
+    fontSizes = [("xs", "extra small"), ("sm", "small"), ("md", "medium"), ("lg", "large"), ("xl", "extra large")]
 
 songDetails :: ViewVars -> Song -> Html
 songDetails vv x = do
@@ -123,56 +124,58 @@ mkVersion vv v = do
 
 songCreatePage' :: (MonadIO m) => Env -> ViewVars -> m Html
 songCreatePage' env vv = do
-  simplePage env vv (SimplePageTitle "Create song") $ section $ do
-    postForm "/songs/create" $ do
-      requiredTextInput "displayName" "song name"
-      optionalTextArea "description" "description"
-      optionalTextInput "spotifyUrl" "spotify URL"
-      optionalTextInput "youtubeUrl" "youtube URL"
-      optionalTextInput "wikipediaUrl" "wikipedia URL"
-      optionalTextInput "soundcloudUrl" "soundcloud URL"
-      optionalTextInput "musicKey" "music key"
-      optionalTextInput "musicTuning" "tuning"
-      optionalTextInput "musicCreationDate" "date composed"
-      optionalTextInput "albumName" "album name"
-      optionalTextInput "albumInfoLink" "about the album"
-      submitButton vv
+  simplePage env vv (SimplePageTitle "Create song") $ do
+    section ! css' ["container", "mx-auto"] $ do
+      postForm "/songs/create" $ do
+        requiredTextInput "displayName" "song name"
+        optionalTextArea "description" "description"
+        optionalTextInput "spotifyUrl" "spotify URL"
+        optionalTextInput "youtubeUrl" "youtube URL"
+        optionalTextInput "wikipediaUrl" "wikipedia URL"
+        optionalTextInput "soundcloudUrl" "soundcloud URL"
+        optionalTextInput "musicKey" "music key"
+        optionalTextInput "musicTuning" "tuning"
+        optionalTextInput "musicCreationDate" "date composed"
+        optionalTextInput "albumName" "album name"
+        optionalTextInput "albumInfoLink" "about the album"
+        submitButton vv
 
 songEditPage' :: (MonadIO m) => Env -> ViewVars -> Song -> m Html
 songEditPage' env vv song = do
-  simplePage env vv (SimplePageTitle "Edit song") $ section $ do
-    postForm ("/songs/edit/" <> uuidToText (song ^. #identifier)) $ do
-      requiredTextInput' "displayName" "song name" (Just $ song ^. #displayName)
-      optionalTextArea' "description" "description" (song ^. #description)
-      optionalTextInput' "spotifyUrl" "spotify URL" (song ^. #spotifyUrl)
-      optionalTextInput' "youtubeUrl" "youtube URL" (song ^. #youtubeUrl)
-      optionalTextInput' "wikipediaUrl" "wikipedia URL" (song ^. #wikipediaUrl)
-      optionalTextInput' "soundcloudUrl" "soundcloud URL" (song ^. #soundcloudUrl)
-      optionalTextInput' "musicKey" "music key" (song ^. #musicKey)
-      optionalTextInput' "musicTuning" "tuning" (song ^. #musicTuning)
-      optionalTextInput' "musicCreationDate" "date composed" (song ^. #musicCreationDate)
-      optionalTextInput' "albumName" "album name" (song ^. #albumName)
-      optionalTextInput' "albumInfoLink" "about the album" (song ^. #albumInfoLink)
-      submitButton vv
+  simplePage env vv (SimplePageTitle "Edit song") $ do
+    section ! css' ["container", "mx-auto"] $ do
+      postForm ("/songs/edit/" <> uuidToText (song ^. #identifier)) $ do
+        requiredTextInput' "displayName" "song name" (Just $ song ^. #displayName)
+        optionalTextArea' "description" "description" (song ^. #description)
+        optionalTextInput' "spotifyUrl" "spotify URL" (song ^. #spotifyUrl)
+        optionalTextInput' "youtubeUrl" "youtube URL" (song ^. #youtubeUrl)
+        optionalTextInput' "wikipediaUrl" "wikipedia URL" (song ^. #wikipediaUrl)
+        optionalTextInput' "soundcloudUrl" "soundcloud URL" (song ^. #soundcloudUrl)
+        optionalTextInput' "musicKey" "music key" (song ^. #musicKey)
+        optionalTextInput' "musicTuning" "tuning" (song ^. #musicTuning)
+        optionalTextInput' "musicCreationDate" "date composed" (song ^. #musicCreationDate)
+        optionalTextInput' "albumName" "album name" (song ^. #albumName)
+        optionalTextInput' "albumInfoLink" "about the album" (song ^. #albumInfoLink)
+        submitButton vv
 
-    entityArtworkForm vv "songs" (map (^. #artwork) . mapElems $ song ^. #artworks)
-    hr
-    entityNewArtworkForm vv "songs" (song ^. #identifier)
-    mapM_ (\c -> hr >> songContentsEditForm env vv (song ^. #identifier) c) (mapElems $ song ^. #contents)
-    hr
-    H.h2 "Create contents"
-    songContentsCreateForm vv (song ^. #identifier)
-    hr
-    H.h2 "Artist <> Song"
+      entityArtworkForm vv "songs" (map (^. #artwork) . mapElems $ song ^. #artworks)
+      hr
+      entityNewArtworkForm vv "songs" (song ^. #identifier)
+      mapM_ (\c -> hr >> songContentsEditForm env vv (song ^. #identifier) c) (mapElems $ song ^. #contents)
+      hr
+      H.h2 "Create contents"
+      songContentsCreateForm vv (song ^. #identifier)
+      hr
+      H.h2 "Artist <> Song"
 
-    mapM_
-      ( \art -> do
-          H.h4 . text $ art
-          -- dangerPostForm vv ("/songs/" <> (T.pack . Relude.show $ song ^. #identifier) <> "/artists/" <> (T.pack . Relude.show $ artistIdentifier) <> "/delete") $ do
-          --   deleteButton vv
-      )
-      (mapElems $ song ^. #artists)
-    songArtistForm vv (song ^. #identifier)
+      mapM_
+        ( \art -> do
+            H.h4 . text $ art
+            -- dangerPostForm vv ("/songs/" <> (T.pack . Relude.show $ song ^. #identifier) <> "/artists/" <> (T.pack . Relude.show $ artistIdentifier) <> "/delete") $ do
+            --   deleteButton vv
+        )
+        (mapElems $ song ^. #artists)
+      songArtistForm vv (song ^. #identifier)
 
 songArtistForm :: ViewVars -> UUID -> Html
 songArtistForm vv songIdentifier = do

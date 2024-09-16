@@ -176,23 +176,23 @@ entityArtworkForm vv path xs = section $ do
     mapM_ (mkArtworkManager vv path) arts
 
 mkArtworkManager :: ViewVars -> Text -> Artwork -> Html
-mkArtworkManager vv path artwork = H.div $ do
+mkArtworkManager vv path artwork = H.div ! css' ["flex", "flex-col", "flex-wrap", "justify-center", "w-64"] $ do
   img
-    ! css' ["object-cover"]
+    ! css' ["object-cover", "w-64", "h-auto", "rounded-2xl"]
     ! customAttribute "loading" "lazy"
     ! src (textToAttrValue $ artwork ^. #contentUrl)
   mapM_ (H.span . text) (artwork ^. #contentCaption)
-  H.div $ do
+  H.div ! css' ["flex", "flex-row", "flex-wrap", "justify-center", "gap-4"] $ do
     postForm ("/" <> path <> "/artworks/order/" <> uuidToText (artwork ^. #identifier)) $ do
       input ! type_ "hidden" ! name "orderValue" ! A.value (textToAttrValue plusOne)
-      button ! class_ "small-button" ! type_ "submit" $ small . text $ plusOne
+      button ! css (cssButton vv) ! type_ "submit" $ small . text $ plusOne
     postForm ("/" <> path <> "/artworks/order/" <> uuidToText (artwork ^. #identifier)) $ do
       input
         ! type_ "hidden"
         ! name "orderValue"
         ! A.value
           (textToAttrValue minusOne)
-      button ! class_ "small-button" ! type_ "submit" $ small . text $ minusOne
+      button ! css (cssButton vv) ! type_ "submit" $ small . text $ minusOne
   H.div
     ! css' []
     $ dangerPostForm

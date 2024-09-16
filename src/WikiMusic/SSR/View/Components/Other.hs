@@ -49,7 +49,7 @@ simpleEntityCard vv path entity = article
       "max-w-56",
       "border",
       if vv ^. #uiMode % #value == "dark" then "dark:bg-black/70" else "bg-white/80",
-      "border-" <> vv ^. #palette % #value <> "-300"
+      "border-" <> vv ^. #palette % #value <> "-300/50"
     ]
   $ do
     maybeImg
@@ -98,25 +98,26 @@ entityDetailsSkeleton slot0 slot1 =
     H.div ! css' ["flex", "flex-col", "flex-wrap", "w-full", "md:w-1/2", "my-4"] $ do
       slot1
 
-verboseLink' uri = a ! href (fromString . unpackText $ uri) $ text uri
+hiddenUriLink' vv txt uri = a ! target "_blank" ! css (cssLink vv) ! href (fromString . unpackText $ uri) $ text ("🔗 " <> txt)
 
 entityLinks vv x = do
   mapM_
-    (detailListEntry vv "Spotify" . verboseLink')
+    (hiddenUriLink' vv "Spotify")
     (x ^. #spotifyUrl)
   mapM_
-    (detailListEntry vv "Wikipedia" . verboseLink')
+    (hiddenUriLink' vv "Wikipedia")
     (x ^. #wikipediaUrl)
   mapM_
-    (detailListEntry vv "YouTube" . verboseLink')
+    (hiddenUriLink' vv "YouTube")
     (x ^. #youtubeUrl)
   mapM_
-    (detailListEntry vv "SoundCloud" . verboseLink')
+    (hiddenUriLink' vv "SoundCloud")
     (x ^. #soundcloudUrl)
 
-slot0 x = do
-  imageCarousel (map (^. #artwork) (mapElems $ x ^. #artworks))
-  mapM_ ((p ! A.class_ "white-space-break-spaces") . text) (x ^. #description)
+slot0 vv x = do
+  H.div ! css' ["flex", "flex-col", "flex-wrap", "justify-center", "align-center", "gap-4"] $ do
+    imageCarousel (map (^. #artwork) (mapElems $ x ^. #artworks))
+    mapM_ ((p ! css' ["white-space-break-spaces", if vv ^. #uiMode % #value == "dark" then "text-white" else "text-black"]) . text) (x ^. #description)
 
 slot1 vv path x = section
   ! css'
@@ -138,22 +139,22 @@ slot1 vv path x = section
       . fromString
       . unpackText
       $ (x ^. #displayName)
-    H.div ! class_ "flex flex-row flex-wrap justify-center gap-md" $ do
+    H.div ! css' ["flex", "flex-row", "flex-wrap", "justify-center", "gap-4"] $ do
       likesDislikes vv path' x
       entityButtons vv path' x
 
       section
-        ! class_ "flex flex-row flex-wrap justify-center gap-md"
+        ! css' ["flex", "flex-row", "flex-wrap", "justify-center", "gap-4"]
         $ detailList
         $ do
           entityBaseDetails vv x
       hr
-      entityLinks vv x
+    H.div ! css' ["flex", "flex-row", "flex-wrap", "justify-center", "gap-6"] $ entityLinks vv x
   where
     path' = unpackText path
 
 entityDetails vv path x = do
-  entityDetailsSkeleton (slot0 x) (slot1 vv path x)
+  entityDetailsSkeleton (slot0 vv x) (slot1 vv path x)
 
 likesDislikes vv path' x = do
   postForm (fromString ("/" <> path' <> "/like/" <> show (x ^. #identifier))) $ do
