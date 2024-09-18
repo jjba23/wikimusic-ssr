@@ -4,9 +4,7 @@ fmt:
 	find . -name '*.hs' -type f -exec ormolu --mode inplace {} \;
 	find . -name '*.nix' -exec nixfmt {} \;
 	-statix check
-	-deadnix -f
-	-npm install stylelint-config-recommended --save-dev
-	-stylelint  "resources/css/*.css"
+	-deadnix -f	
 ghcid-dev:
 	ghcid --warnings --restart=./wikimusic-ssr.cabal --test "WikiMusic.SSR.Boot.boot"
 dev: fmt

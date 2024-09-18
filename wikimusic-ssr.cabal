@@ -1,7 +1,7 @@
 cabal-version: 1.12
 
 name:           wikimusic-ssr
-version:        1.0.1.4
+version:        1.0.1.5
 description:    Please see the README at <https://github.com/jjba23/wikimusic-ssr>
 homepage:       https://github.com/jjba23/wikimusic-ssr
 bug-reports:    https://github.com/jjba23/wikimusic-ssr/-/issues
@@ -18,7 +18,6 @@ extra-source-files:
 source-repository head
   type: git
   location: https://github.com/jjba23/wikimusic-ssr
-  subdir: wikimusic-ssr
 
 library
   exposed-modules:
