@@ -28,11 +28,7 @@ mkSharedHead _ _ pageTitle = do
     H.style
       . text
       $ [trimming|
-                 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-                 @font-face {
-                   font-family: 'Iosevka Comfy Wide';
-                   src: url('https://raw.githubusercontent.com/protesilaos/iosevka-comfy/master/iosevka-comfy-wide/TTF/iosevka-comfy-wide-normalregularupright.ttf');
-                 }                              
+                 @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
         |]
     H.script ! src "https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,container-queries" $ ""
     H.script
@@ -42,9 +38,9 @@ mkSharedHead _ _ pageTitle = do
         theme: {
           container: { center: true },
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            serif: ['Inter', 'serif'],
-            mono: ['Iosevka Comfy Wide', 'monospace']
+            sans: ['Roboto Condensed', 'sans-serif'],
+            serif: ['Roboto Slabe', 'serif'],
+            mono: ['Roboto Mono', 'monospace']
           },
         }
       }                              
